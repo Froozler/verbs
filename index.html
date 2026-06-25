@@ -31,23 +31,19 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         body { background: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
         
-        /* App Header */
         header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: #000; z-index: 20; border-bottom: 1px solid #222; }
         .title { font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
         .global-score { font-size: 0.85rem; background: var(--surface); padding: 4px 10px; border-radius: 20px; color: var(--primary); font-weight: bold; }
         
-        /* Top Navigation Tabs */
         .nav-tabs { display: flex; background: #000; padding: 10px 20px; gap: 10px; border-bottom: 1px solid #222; }
         .nav-tabs button { flex: 1; background: var(--surface); color: #a1a1aa; border: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.2s; }
         .nav-tabs button.active { background: var(--primary); color: #000; }
 
-        /* Settings Strip */
         .settings-strip { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--bg-alt); border-bottom: 1px solid #222; font-size: 0.85rem; gap: 10px; }
         .toggle-label { display: flex; align-items: center; gap: 6px; color: #a1a1aa; cursor: pointer; }
         .pace-control { display: flex; align-items: center; gap: 8px; color: #a1a1aa; }
         .pace-control select { background: var(--surface); color: white; border: 1px solid #3f3f46; border-radius: 6px; padding: 4px 8px; font-size: 0.85rem; outline: none; cursor: pointer; }
 
-        /* Sidebar / Verb Selector */
         .sidebar { background: var(--surface); display: flex; gap: 10px; padding: 12px; overflow-x: auto; white-space: nowrap; border-bottom: 1px solid #111; flex-shrink: 0; scrollbar-width: none; }
         .sidebar::-webkit-scrollbar { display: none; }
         .verb-chip { background: var(--bg); color: var(--text); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.95rem; border: 2px solid transparent; display: flex; align-items: center; gap: 8px; transition: 0.1s; }
@@ -55,26 +51,21 @@
         .verb-chip.locked { opacity: 0.4; cursor: not-allowed; border: 1px dashed var(--locked); background: transparent; }
         .chip-streak { font-size: 0.75rem; background: #000; padding: 2px 6px; border-radius: 10px; color: var(--primary); }
 
-        /* Main Workspace */
         .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 20px; align-items: center; background: var(--bg); }
         
-        /* PRACTICE VIEW */
         #viewPractice { width: 100%; max-width: 450px; display: flex; flex-direction: column; align-items: center; }
         .card { background: var(--surface); width: 100%; padding: 30px 20px; border-radius: 16px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-top: 4px solid var(--primary); transition: border-color 0.3s ease; }
         .meta-info { display: flex; justify-content: space-between; font-size: 0.85rem; color: #a1a1aa; margin-bottom: 20px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
         
-        /* Dynamic Tense Text */
         #displayTense { color: var(--primary); font-weight: 900; transition: color 0.3s ease; }
         
         .pronoun { font-size: 1.3rem; color: #d4d4d8; margin-bottom: 4px; font-weight: bold; }
         .infinitive { font-size: 2.2rem; font-weight: 800; margin-bottom: 25px; letter-spacing: -1px; }
         
-        /* ContentEditable Fake Input */
         .fake-input { width: 100%; background: var(--bg); border: 2px solid #3f3f46; color: white; padding: 15px; font-size: 1.4rem; border-radius: 8px; text-align: center; outline: none; margin-bottom: 15px; cursor: text; white-space: nowrap; overflow: hidden; min-height: 58px; font-weight: bold; transition: border-color 0.2s; }
         .fake-input:focus { border-color: var(--primary); }
         .fake-input:empty:before { content: attr(placeholder); color: #52525b; pointer-events: none; display: block; font-weight: normal; }
 
-        /* Dynamic Submit Button */
         .submit-btn { width: 100%; background: var(--primary); color: #000; font-weight: bold; font-size: 1.2rem; padding: 15px; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease, color 0.3s ease, transform 0.1s; }
         .submit-btn:active { transform: scale(0.98); }
         
@@ -88,7 +79,6 @@
         .fb-rule { font-size: 0.9rem; color: #a1a1aa; margin-bottom: 6px; line-height: 1.4; }
         .fb-example { font-size: 0.9rem; color: white; font-style: italic; opacity: 0.9; }
 
-        /* REFERENCE VIEW */
         #viewReference { width: 100%; max-width: 600px; display: none; flex-direction: column; padding-bottom: 40px; }
         .ref-hero { margin-bottom: 25px; text-align: center; }
         .ref-hero h2 { font-size: 3rem; font-weight: 900; letter-spacing: -2px; color: white; margin-bottom: 5px; }
@@ -182,7 +172,6 @@
         // Core Data
         const pronouns = ["yo", "vos", "él/ella", "nosotros", "ellos/ellas"];
         
-        // Dynamic Tense Colors mapped to CSS variables
         const tenses = [
             { id: "present", name: "Presente", req: 0, color: "var(--t-present)" },
             { id: "preterite", name: "Pretérito", req: 5, color: "var(--t-preterite)" },
@@ -192,58 +181,146 @@
             { id: "subjunctive", name: "Subjuntivo", req: 25, color: "var(--t-subjunctive)" }
         ];
 
+        // MASSIVE PROGRESSIVE DICTIONARY (60 Verbs)
         const verbsDB = {
-            "hablar": { trans: "to speak", type: "ar", root: "habl", unlockReq: 0, desc: "A standard regular -AR verb. Master this to learn the baseline pattern for all -ar verbs.", obj: "español rápido" },
-            "tomar": { trans: "to take / to drink", type: "ar", root: "tom", unlockReq: 0, desc: "Standard -AR verb. Extremely common in Paraguay for drinking Tereré or taking transport.", obj: "un tereré" },
-            "comer": { trans: "to eat", type: "er", root: "com", unlockReq: 10, desc: "Standard regular -ER verb. Notice how the endings shift from 'a' to 'e'.", obj: "chipa" },
-            "vivir": { trans: "to live", type: "ir", root: "viv", unlockReq: 10, desc: "Standard regular -IR verb. Very similar to -ER verbs, but notice the 'vos' form (vivís).", obj: "acá" },
+            // --- STAGE 1: Regular -AR (Unlock: 0) ---
+            "hablar": { trans: "to speak", type: "ar", root: "habl", unlockReq: 0, desc: "Regular -AR.", obj: "español" },
+            "tomar": { trans: "to take/drink", type: "ar", root: "tom", unlockReq: 0, desc: "Regular -AR. Crucial for Tereré.", obj: "tereré" },
+            "trabajar": { trans: "to work", type: "ar", root: "trabaj", unlockReq: 0, desc: "Regular -AR.", obj: "mucho" },
+            "estudiar": { trans: "to study", type: "ar", root: "estudi", unlockReq: 0, desc: "Regular -AR.", obj: "todos los días" },
+            "ayudar": { trans: "to help", type: "ar", root: "ayud", unlockReq: 0, desc: "Regular -AR.", obj: "a mi amigo" },
+            "caminar": { trans: "to walk", type: "ar", root: "camin", unlockReq: 0, desc: "Regular -AR.", obj: "al parque" },
+            "comprar": { trans: "to buy", type: "ar", root: "compr", unlockReq: 0, desc: "Regular -AR.", obj: "empanadas" },
+            "escuchar": { trans: "to listen", type: "ar", root: "escuch", unlockReq: 0, desc: "Regular -AR.", obj: "la radio" },
+            "mirar": { trans: "to watch/look", type: "ar", root: "mir", unlockReq: 0, desc: "Regular -AR.", obj: "la tele" },
+            "necesitar": { trans: "to need", type: "ar", root: "necesit", unlockReq: 0, desc: "Regular -AR.", obj: "dinero" },
+            "preguntar": { trans: "to ask", type: "ar", root: "pregunt", unlockReq: 0, desc: "Regular -AR.", obj: "algo" },
+            "usar": { trans: "to use", type: "ar", root: "us", unlockReq: 0, desc: "Regular -AR.", obj: "el teléfono" },
+            "viajar": { trans: "to travel", type: "ar", root: "viaj", unlockReq: 0, desc: "Regular -AR.", obj: "a Asunción" },
+            "cenar": { trans: "to have dinner", type: "ar", root: "cen", unlockReq: 0, desc: "Regular -AR.", obj: "tarde" },
+            "limpiar": { trans: "to clean", type: "ar", root: "limpi", unlockReq: 0, desc: "Regular -AR.", obj: "la casa" },
+            "cantar": { trans: "to sing", type: "ar", root: "cant", unlockReq: 0, desc: "Regular -AR.", obj: "bien" },
+
+            // --- STAGE 2: Regular -ER & -IR (Unlock: 20) ---
+            "comer": { trans: "to eat", type: "er", root: "com", unlockReq: 20, desc: "Regular -ER.", obj: "chipa" },
+            "beber": { trans: "to drink", type: "er", root: "beb", unlockReq: 20, desc: "Regular -ER.", obj: "agua" },
+            "comprender": { trans: "to understand", type: "er", root: "comprend", unlockReq: 20, desc: "Regular -ER.", obj: "todo" },
+            "correr": { trans: "to run", type: "er", root: "corr", unlockReq: 20, desc: "Regular -ER.", obj: "rápido" },
+            "creer": { trans: "to believe", type: "er", root: "cre", unlockReq: 20, desc: "Regular -ER.", obj: "eso" },
+            "deber": { trans: "to owe/must", type: "er", root: "deb", unlockReq: 20, desc: "Regular -ER.", obj: "hacerlo" },
+            "leer": { trans: "to read", type: "er", root: "le", unlockReq: 20, desc: "Regular -ER.", obj: "un libro" },
+            "responder": { trans: "to answer", type: "er", root: "respond", unlockReq: 20, desc: "Regular -ER.", obj: "la pregunta" },
+            "vender": { trans: "to sell", type: "er", root: "vend", unlockReq: 20, desc: "Regular -ER.", obj: "el auto" },
+            "prometer": { trans: "to promise", type: "er", root: "promet", unlockReq: 20, desc: "Regular -ER.", obj: "volver" },
+            "vivir": { trans: "to live", type: "ir", root: "viv", unlockReq: 20, desc: "Regular -IR.", obj: "acá" },
+            "abrir": { trans: "to open", type: "ir", root: "abr", unlockReq: 20, desc: "Regular -IR.", obj: "la puerta" },
+            "decidir": { trans: "to decide", type: "ir", root: "decid", unlockReq: 20, desc: "Regular -IR.", obj: "hoy" },
+            "escribir": { trans: "to write", type: "ir", root: "escrib", unlockReq: 20, desc: "Regular -IR.", obj: "un mensaje" },
+            "recibir": { trans: "to receive", type: "ir", root: "recib", unlockReq: 20, desc: "Regular -IR.", obj: "un regalo" },
+            "asistir": { trans: "to attend", type: "ir", root: "asist", unlockReq: 20, desc: "Regular -IR.", obj: "a la fiesta" },
+            "subir": { trans: "to go up / upload", type: "ir", root: "sub", unlockReq: 20, desc: "Regular -IR.", obj: "la escalera" },
+
+            // --- STAGE 3: High-Frequency Irregulars (Unlock: 50) ---
             "tener": { 
-                trans: "to have", type: "irr", unlockReq: 15, futRoot: "tendr", obj: "tiempo",
-                desc: "Highly common irregular verb (e -> ie). In the 'vos' present tense, it is regularized to 'tenés'.",
-                present: ["tengo", "tenés", "tiene", "tenemos", "tienen"],
-                preterite: ["tuve", "tuviste", "tuvo", "tuvimos", "tuvieron"],
-                imperfect: ["tenía", "tenías", "tenía", "teníamos", "tenían"],
-                subjunctive: ["tenga", "tengas", "tenga", "tengamos", "tengan"]
+                trans: "to have", type: "irr", unlockReq: 50, futRoot: "tendr", obj: "tiempo", desc: "Irregular (e->ie). Vos form: tenés.",
+                present: ["tengo","tenés","tiene","tenemos","tienen"], preterite: ["tuve","tuviste","tuvo","tuvimos","tuvieron"],
+                imperfect: ["tenía","tenías","tenía","teníamos","tenían"], subjunctive: ["tenga","tengas","tenga","tengamos","tengan"]
             },
             "poder": { 
-                trans: "to be able to (can)", type: "irr", unlockReq: 25, futRoot: "podr", obj: "hacerlo",
-                desc: "Stem-changing verb (o -> ue). IMPORTANT: In Paraguayan Voseo, 'vos' does NOT stem-change in the present tense (vos podés).",
-                present: ["puedo", "podés", "puede", "podemos", "pueden"], 
-                preterite: ["pude", "pudiste", "pudo", "pudimos", "pudieron"],
-                imperfect: ["podía", "podías", "podía", "podíamos", "podían"],
-                subjunctive: ["pueda", "puedas", "pueda", "podamos", "puedan"]
+                trans: "to be able to", type: "irr", unlockReq: 50, futRoot: "podr", obj: "hacerlo", desc: "Stem-changing (o->ue). Vos form: podés.",
+                present: ["puedo","podés","puede","podemos","pueden"], preterite: ["pude","pudiste","pudo","pudimos","pudieron"],
+                imperfect: ["podía","podías","podía","podíamos","podían"], subjunctive: ["pueda","puedas","pueda","podamos","puedan"]
             },
             "querer": {
-                trans: "to want", type: "irr", unlockReq: 25, futRoot: "querr", obj: "más",
-                desc: "Stem-changing verb (e -> ie). Again, no stem change for 'vos' in the present (vos querés).",
-                present: ["quiero", "querés", "quiere", "queremos", "quieren"],
-                preterite: ["quise", "quisiste", "quiso", "quisimos", "quisieron"],
-                imperfect: ["quería", "querías", "quería", "queríamos", "querían"],
-                subjunctive: ["quiera", "quieras", "quiera", "queramos", "quieran"]
+                trans: "to want", type: "irr", unlockReq: 50, futRoot: "querr", obj: "más", desc: "Stem-changing (e->ie). Vos form: querés.",
+                present: ["quiero","querés","quiere","queremos","quieren"], preterite: ["quise","quisiste","quiso","quisimos","quisieron"],
+                imperfect: ["quería","querías","quería","queríamos","querían"], subjunctive: ["quiera","quieras","quiera","queramos","quieran"]
             },
             "ser": {
-                trans: "to be (identity/permanent)", type: "irr", unlockReq: 40, obj: "de Paraguay",
-                desc: "Highly irregular. Used for identity, origin, and permanent characteristics.",
-                present: ["soy", "sos", "es", "somos", "son"],
-                preterite: ["fui", "fuiste", "fue", "fuimos", "fueron"],
-                imperfect: ["era", "eras", "era", "éramos", "eran"],
-                subjunctive: ["sea", "seas", "sea", "seamos", "sean"]
+                trans: "to be (permanent)", type: "irr", unlockReq: 50, obj: "paraguayo", desc: "Highly irregular.",
+                present: ["soy","sos","es","somos","son"], preterite: ["fui","fuiste","fue","fuimos","fueron"],
+                imperfect: ["era","eras","era","éramos","eran"], subjunctive: ["sea","seas","sea","seamos","sean"]
             },
             "estar": {
-                trans: "to be (location/state)", type: "irr", unlockReq: 40, obj: "listo",
-                desc: "Irregular. Used for locations, temporary states, and feelings.",
-                present: ["estoy", "estás", "está", "estamos", "están"],
-                preterite: ["estuve", "estuviste", "estuvo", "estuvimos", "estuvieron"],
-                imperfect: ["estaba", "estabas", "estaba", "estábamos", "estaban"],
-                subjunctive: ["esté", "estés", "esté", "estemos", "estén"]
+                trans: "to be (state/location)", type: "irr", unlockReq: 50, obj: "listo", desc: "Irregular.",
+                present: ["estoy","estás","está","estamos","están"], preterite: ["estuve","estuviste","estuvo","estuvimos","estuvieron"],
+                imperfect: ["estaba","estabas","estaba","estábamos","estaban"], subjunctive: ["esté","estés","esté","estemos","estén"]
             },
             "ir": {
-                trans: "to go", type: "irr", unlockReq: 60, obj: "al mercado",
-                desc: "Highly irregular. The preterite (past) is identically shared with the verb 'ser'.",
-                present: ["voy", "vas", "va", "vamos", "van"],
-                preterite: ["fui", "fuiste", "fue", "fuimos", "fueron"],
-                imperfect: ["iba", "ibas", "iba", "íbamos", "iban"],
-                subjunctive: ["vaya", "vayas", "vaya", "vayamos", "vayan"]
+                trans: "to go", type: "irr", unlockReq: 50, obj: "al centro", desc: "Highly irregular. Preterite matches 'ser'.",
+                present: ["voy","vas","va","vamos","van"], preterite: ["fui","fuiste","fue","fuimos","fueron"],
+                imperfect: ["iba","ibas","iba","íbamos","iban"], subjunctive: ["vaya","vayas","vaya","vayamos","vayan"]
+            },
+            "hacer": {
+                trans: "to do/make", type: "irr", unlockReq: 50, futRoot: "har", obj: "el trabajo", desc: "Go-verb. Vos form: hacés.",
+                present: ["hago","hacés","hace","hacemos","hacen"], preterite: ["hice","hiciste","hizo","hicimos","hicieron"],
+                imperfect: ["hacía","hacías","hacía","hacíamos","hacían"], subjunctive: ["haga","hagas","haga","hagamos","hagan"]
+            },
+            "decir": {
+                trans: "to say/tell", type: "irr", unlockReq: 50, futRoot: "dir", obj: "la verdad", desc: "Irregular (e->i). Vos form: decís.",
+                present: ["digo","decís","dice","decimos","dicen"], preterite: ["dije","dijiste","dijo","dijimos","dijeron"],
+                imperfect: ["decía","decías","decía","decíamos","decían"], subjunctive: ["diga","digas","diga","digamos","digan"]
+            },
+            "venir": {
+                trans: "to come", type: "irr", unlockReq: 50, futRoot: "vendr", obj: "aquí", desc: "Irregular (e->ie). Vos form: venís.",
+                present: ["vengo","venís","viene","venimos","vienen"], preterite: ["vine","viniste","vino","vinimos","vinieron"],
+                imperfect: ["venía","venías","venía","veníamos","venían"], subjunctive: ["venga","vengas","venga","vengamos","vengan"]
+            },
+            "saber": {
+                trans: "to know (facts)", type: "irr", unlockReq: 50, futRoot: "sabr", obj: "la respuesta", desc: "Irregular.",
+                present: ["sé","sabés","sabe","sabemos","saben"], preterite: ["supe","supiste","supo","supimos","supieron"],
+                imperfect: ["sabía","sabías","sabía","sabíamos","sabían"], subjunctive: ["sepa","sepas","sepa","sepamos","sepan"]
+            },
+            "ver": {
+                trans: "to see", type: "irr", unlockReq: 50, obj: "la película", desc: "Irregular present & imperfect.",
+                present: ["veo","ves","ve","vemos","ven"], preterite: ["vi","viste","vio","vimos","vieron"],
+                imperfect: ["veía","veías","veía","veíamos","veían"], subjunctive: ["vea","veas","vea","veamos","vean"]
+            },
+
+            // --- STAGE 4: Extended Handy Verbs (Unlock: 100) ---
+            "dejar": { trans: "to leave (something)", type: "ar", root: "dej", unlockReq: 100, desc: "Regular -AR.", obj: "las llaves" },
+            "llevar": { trans: "to carry/take", type: "ar", root: "llev", unlockReq: 100, desc: "Regular -AR.", obj: "las bolsas" },
+            "quedar": { trans: "to stay/remain", type: "ar", root: "qued", unlockReq: 100, desc: "Regular -AR.", obj: "en casa" },
+            "llamar": { trans: "to call", type: "ar", root: "llam", unlockReq: 100, desc: "Regular -AR.", obj: "a mi madre" },
+            "pasar": { trans: "to pass/happen", type: "ar", root: "pas", unlockReq: 100, desc: "Regular -AR.", obj: "por ahí" },
+            "esperar": { trans: "to wait/hope", type: "ar", root: "esper", unlockReq: 100, desc: "Regular -AR.", obj: "el colectivo" },
+            "entrar": { trans: "to enter", type: "ar", root: "entr", unlockReq: 100, desc: "Regular -AR.", obj: "al cuarto" },
+            "terminar": { trans: "to finish", type: "ar", root: "termin", unlockReq: 100, desc: "Regular -AR.", obj: "el proyecto" },
+            "sacar": { trans: "to take out", type: "ar", root: "sac", unlockReq: 100, desc: "Regular -AR. (ortho preterite: saqué)", obj: "la basura" },
+            "dar": {
+                trans: "to give", type: "irr", unlockReq: 100, obj: "un regalo", desc: "Irregular.",
+                present: ["doy","das","da","damos","dan"], preterite: ["di","diste","dio","dimos","dieron"],
+                imperfect: ["daba","dabas","daba","dábamos","daban"], subjunctive: ["dé","des","dé","demos","den"]
+            },
+            "salir": {
+                trans: "to leave/go out", type: "irr", unlockReq: 100, futRoot: "saldr", obj: "de casa", desc: "Go-verb. Vos form: salís.",
+                present: ["salgo","salís","sale","salimos","salen"], preterite: ["salí","saliste","salió","salimos","salieron"],
+                imperfect: ["salía","salías","salía","salíamos","salían"], subjunctive: ["salga","salgas","salga","salgamos","salgan"]
+            },
+            "jugar": {
+                trans: "to play", type: "irr", unlockReq: 100, obj: "fútbol", desc: "Stem-changing (u->ue). Vos form: jugás.",
+                present: ["juego","jugás","juega","jugamos","juegan"], preterite: ["jugué","jugaste","jugó","jugamos","jugaron"],
+                imperfect: ["jugaba","jugabas","jugaba","jugábamos","jugaban"], subjunctive: ["juegue","juegues","juegue","juguemos","jueguen"]
+            },
+            "dormir": {
+                trans: "to sleep", type: "irr", unlockReq: 100, obj: "mucho", desc: "Stem-changing (o->ue). Vos form: dormís.",
+                present: ["duermo","dormís","duerme","dormimos","duermen"], preterite: ["dormí","dormiste","durmió","dormimos","durmieron"],
+                imperfect: ["dormía","dormías","dormía","dormíamos","dormían"], subjunctive: ["duerma","duermas","duerma","durmamos","duerman"]
+            },
+            "pensar": {
+                trans: "to think", type: "irr", unlockReq: 100, obj: "en ti", desc: "Stem-changing (e->ie). Vos form: pensás.",
+                present: ["pienso","pensás","piensa","pensamos","piensan"], preterite: ["pensé","pensaste","pensó","pensamos","pensaron"],
+                imperfect: ["pensaba","pensabas","pensaba","pensábamos","pensaban"], subjunctive: ["piense","pienses","piense","pensemos","piensen"]
+            },
+            "poner": {
+                trans: "to put", type: "irr", unlockReq: 100, futRoot: "pondr", obj: "en la mesa", desc: "Go-verb. Vos form: ponés.",
+                present: ["pongo","ponés","pone","ponemos","ponen"], preterite: ["puse","pusiste","puso","pusimos","pusieron"],
+                imperfect: ["ponía","ponías","ponía","poníamos","ponían"], subjunctive: ["ponga","pongas","ponga","pongamos","pongan"]
+            },
+            "encontrar": {
+                trans: "to find", type: "irr", unlockReq: 100, obj: "las llaves", desc: "Stem-changing (o->ue). Vos form: encontrás.",
+                present: ["encuentro","encontrás","encuentra","encontramos","encuentran"], preterite: ["encontré","encontraste","encontró","encontramos","encontraron"],
+                imperfect: ["encontraba","encontrabas","encontraba","encontrábamos","encontraban"], subjunctive: ["encuentre","encuentres","encuentre","encontremos","encuentren"]
             }
         };
 
@@ -262,14 +339,14 @@
         document.getElementById('paceMultiplier').value = userSettings.pace;
 
         // Core App Storage
-        let userData = JSON.parse(localStorage.getItem('pySpanishV9')) || { lastActive: new Date().toDateString(), verbs: {} };
+        let userData = JSON.parse(localStorage.getItem('pySpanishV10')) || { lastActive: new Date().toDateString(), verbs: {} };
         Object.keys(verbsDB).forEach(v => { if (!userData.verbs[v]) userData.verbs[v] = { streak: 0 }; });
 
         let today = new Date().toDateString();
         if (userData.lastActive !== today) {
             Object.keys(verbsDB).forEach(v => { userData.verbs[v].streak = Math.max(0, userData.verbs[v].streak - 2); });
             userData.lastActive = today;
-            localStorage.setItem('pySpanishV9', JSON.stringify(userData));
+            localStorage.setItem('pySpanishV10', JSON.stringify(userData));
         }
 
         let state = { 
@@ -280,11 +357,10 @@
             globalScore: 0, 
             view: 'practice',
             pace: userSettings.pace,
-            lastCombo: "", // Anti-repeat tracking
-            focus: { active: false, tenseId: null, repsLeft: 0 } // Onboarding mode tracking
+            lastCombo: "",
+            focus: { active: false, tenseId: null, repsLeft: 0 }
         };
 
-        // DOM Setup
         const elInput = document.getElementById('answerInput');
         const elFeedback = document.getElementById('feedback');
         const elSubmitBtn = document.getElementById('submitBtn');
@@ -299,7 +375,6 @@
             document.execCommand('insertText', false, text);
         });
 
-        // Event Listeners for Settings
         document.getElementById('strictAccentsToggle').addEventListener('change', (e) => {
             userSettings.strict = e.target.checked;
             localStorage.setItem('pySpanishPrefs', JSON.stringify(userSettings));
@@ -309,13 +384,12 @@
             state.pace = parseInt(e.target.value);
             userSettings.pace = state.pace;
             localStorage.setItem('pySpanishPrefs', JSON.stringify(userSettings));
-            state.focus.active = false; // Kill focus mode if settings change
+            state.focus.active = false;
             renderSidebar();
             if (state.view === 'practice') generateQuestion();
             if (state.view === 'reference') renderReference();
         });
 
-        // App Logic
         function getConjugation(verbInf, tenseId, pIdx) {
             const v = verbsDB[verbInf];
             if (tenseId === "future") return (v.futRoot || verbInf) + regularEndings.future[pIdx];
@@ -348,7 +422,7 @@
                     div.innerHTML = `${v} <span class="chip-streak">🔥 ${streak}</span>`;
                     div.onclick = () => { 
                         state.currentVerb = v;
-                        state.focus.active = false; // Reset focus mode on verb switch
+                        state.focus.active = false;
                         renderSidebar(); 
                         if(state.view === 'practice') { generateQuestion(); } 
                         if(state.view === 'reference') { renderReference(); }
@@ -363,18 +437,16 @@
             let available = tenses.filter(t => streak >= (t.req * state.pace));
             if (available.length === 0) available = [tenses[0]];
             
-            // Focus Mode Intercept (forces questions to be from newly unlocked tense)
             if (state.focus.active && state.focus.repsLeft > 0) {
                 const focusTense = tenses.find(t => t.id === state.focus.tenseId);
                 if (focusTense) available = [focusTense];
             } else {
-                state.focus.active = false; // Exhausted reps
+                state.focus.active = false; 
             }
 
             let candidateTense, candidatePronounIdx, combo;
             let safetyCounter = 0;
 
-            // Anti-Repeat Generation Loop
             do {
                 candidateTense = available[Math.floor(Math.random() * available.length)];
                 candidatePronounIdx = Math.floor(Math.random() * pronouns.length);
@@ -387,17 +459,14 @@
             state.currentPronounIdx = candidatePronounIdx;
             state.correctAnswer = getConjugation(state.currentVerb, state.currentTense.id, state.currentPronounIdx);
 
-            // UI Updates
             elDisplayTense.innerText = state.focus.active ? `FOCUS: ${state.currentTense.name} (${state.focus.repsLeft} left)` : state.currentTense.name;
             document.getElementById('displayLevel').innerText = `🔥 ${streak}`;
             document.getElementById('displayPronoun').innerText = pronouns[state.currentPronounIdx].toUpperCase();
             document.getElementById('displayInfinitive').innerText = state.currentVerb;
             
-            // Dynamic Tense Colors
             elDisplayTense.style.color = candidateTense.color;
             elPracticeCard.style.borderTopColor = candidateTense.color;
             elSubmitBtn.style.backgroundColor = candidateTense.color;
-            // Contrast Check (Yellow & Green get black text, rest get white)
             elSubmitBtn.style.color = (candidateTense.id === 'present' || candidateTense.id === 'future') ? '#000' : '#fff';
 
             elInput.innerText = "";
@@ -433,7 +502,6 @@
                 feedbackType = "incorrect"; titleText = `Incorrect. Answer: ${rawCorrect}`;
             }
 
-            // Progression & Unlock Detection Logic
             const currentStreak = userData.verbs[state.currentVerb].streak;
             const availableBefore = tenses.filter(t => currentStreak >= (t.req * state.pace)).length;
 
@@ -442,25 +510,23 @@
                 const newStreak = userData.verbs[state.currentVerb].streak;
                 const availableAfter = tenses.filter(t => newStreak >= (t.req * state.pace));
 
-                // Did they just unlock a new tense?
                 if (availableAfter.length > availableBefore && availableAfter.length > 1) {
                     const newTense = availableAfter[availableAfter.length - 1];
                     titleText = `¡NUEVO NIVEL! ${newTense.name.toUpperCase()} UNLOCKED 🚀`;
-                    // Activate Focus Mode (scale reps by pace)
                     state.focus = { active: true, tenseId: newTense.id, repsLeft: 3 + state.pace };
                 } else if (state.focus.active) {
-                    state.focus.repsLeft--; // Count down focus reps
+                    state.focus.repsLeft--;
                 }
 
                 elFeedback.innerHTML = `<div class="fb-title">${titleText}</div>`;
                 elFeedback.classList.add(feedbackType);
-                localStorage.setItem('pySpanishV9', JSON.stringify(userData));
+                localStorage.setItem('pySpanishV10', JSON.stringify(userData));
                 renderSidebar();
                 setTimeout(() => generateQuestion(), 900);
 
             } else {
                 userData.verbs[state.currentVerb].streak = Math.max(0, currentStreak - 2);
-                if (state.focus.active) state.focus.repsLeft--; // Misses still burn a focus rep so they don't get stuck forever
+                if (state.focus.active) state.focus.repsLeft--; 
                 
                 const obj = verbsDB[state.currentVerb].obj;
                 const p = pronouns[state.currentPronounIdx].split('/')[0];
@@ -471,7 +537,7 @@
                     <div class="fb-example">Ejemplo: ${p.charAt(0).toUpperCase() + p.slice(1)} ${rawCorrect} ${obj}.</div>
                 `;
                 elFeedback.classList.add(feedbackType);
-                localStorage.setItem('pySpanishV9', JSON.stringify(userData));
+                localStorage.setItem('pySpanishV10', JSON.stringify(userData));
                 renderSidebar();
                 
                 setTimeout(() => elInput.focus(), 100);
@@ -520,7 +586,6 @@
             });
         }
 
-        // View Controller
         window.switchTab = function(targetView) {
             state.view = targetView;
             document.getElementById('tabPractice').classList.toggle('active', targetView === 'practice');
@@ -537,7 +602,6 @@
             }
         };
 
-        // Listeners
         document.getElementById('submitBtn').addEventListener('click', checkAnswer);
         elInput.addEventListener('keydown', (e) => { 
             if (e.key === 'Enter') {
@@ -546,7 +610,6 @@
             }
         });
 
-        // Initialize App
         renderSidebar();
         generateQuestion();
     </script>
