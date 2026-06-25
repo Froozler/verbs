@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Español Crash ⚡️</title>
+    <title>Español PY 🇵🇾</title>
     <link rel="manifest" href="manifest.json">
     <style>
         :root {
@@ -13,245 +13,268 @@
             --error: #ef4444;
             --success: #22c55e;
             --surface: #27272a;
+            --surface-hover: #3f3f46;
         }
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        /* Header & Nav */
+        header { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--surface); }
+        .title { font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
+        .nav-btns button { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-left: 10px; }
+        .nav-btns button.active { background: var(--primary); color: #000; }
+
+        /* Layout */
+        .container { display: flex; flex: 1; overflow: hidden; flex-direction: column; }
+        @media (min-width: 768px) { .container { flex-direction: row; } }
+
+        /* Sidebar / Verb Selector */
+        .sidebar { background: var(--surface); display: flex; gap: 10px; padding: 15px; overflow-x: auto; white-space: nowrap; border-bottom: 1px solid #111; }
+        @media (min-width: 768px) { 
+            .sidebar { flex-direction: column; width: 250px; overflow-y: auto; overflow-x: hidden; border-bottom: none; border-right: 1px solid #111; } 
         }
-        body { 
-            background: var(--bg); 
-            color: var(--text); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            min-height: 100vh; 
-            padding: 20px; 
-        }
-        header { 
-            width: 100%; 
-            max-width: 400px; 
-            display: flex; 
-            justify-content: space-between; 
-            margin-bottom: 40px; 
-            margin-top: 20px; 
-            font-weight: bold; 
-        }
-        .stats { 
-            display: flex; 
-            gap: 15px; 
-            color: var(--primary); 
-        }
-        .card { 
-            background: var(--surface); 
-            width: 100%; 
-            max-width: 400px; 
-            padding: 40px 20px; 
-            border-radius: 16px; 
-            text-align: center; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
-        }
-        .pronoun { 
-            font-size: 1.2rem; 
-            color: #a1a1aa; 
-            margin-bottom: 5px; 
-        }
-        .infinitive { 
-            font-size: 2.5rem; 
-            font-weight: 800; 
-            margin-bottom: 30px; 
-            letter-spacing: -1px; 
-        }
-        input { 
-            width: 100%; 
-            background: var(--bg); 
-            border: 2px solid #3f3f46; 
-            color: white; 
-            padding: 15px; 
-            font-size: 1.5rem; 
-            border-radius: 8px; 
-            text-align: center; 
-            outline: none; 
-            transition: 0.2s; 
-            margin-bottom: 20px; 
-        }
-        input:focus { 
-            border-color: var(--primary); 
-        }
-        button { 
-            width: 100%; 
-            background: var(--primary); 
-            color: #000; 
-            font-weight: bold; 
-            font-size: 1.2rem; 
-            padding: 15px; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            transition: 0.1s; 
-        }
-        button:active { 
-            transform: scale(0.98); 
-        }
-        .feedback { 
-            margin-top: 20px; 
-            font-size: 1.2rem; 
-            font-weight: bold; 
-            height: 30px; 
-        }
+        .verb-chip { background: var(--bg); color: var(--text); padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; border: 1px solid transparent; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .verb-chip:hover { background: var(--surface-hover); }
+        .verb-chip.selected { border-color: var(--primary); color: var(--primary); }
+        .chip-streak { font-size: 0.8rem; background: #000; padding: 2px 6px; border-radius: 10px; color: #fff; }
+
+        /* Main Content */
+        .main-content { flex: 1; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow-y: auto; }
+        
+        /* Card */
+        .card { background: var(--surface); width: 100%; max-width: 450px; padding: 40px 20px; border-radius: 16px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .meta-info { display: flex; justify-content: space-between; font-size: 0.9rem; color: #a1a1aa; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+        .pronoun { font-size: 1.5rem; color: var(--primary); margin-bottom: 5px; font-weight: bold; }
+        .infinitive { font-size: 2.5rem; font-weight: 800; margin-bottom: 30px; letter-spacing: -1px; }
+        input { width: 100%; background: var(--bg); border: 2px solid #3f3f46; color: white; padding: 15px; font-size: 1.5rem; border-radius: 8px; text-align: center; outline: none; transition: 0.2s; margin-bottom: 20px; }
+        input:focus { border-color: var(--primary); }
+        .submit-btn { width: 100%; background: var(--primary); color: #000; font-weight: bold; font-size: 1.2rem; padding: 15px; border: none; border-radius: 8px; cursor: pointer; transition: 0.1s; }
+        .submit-btn:active { transform: scale(0.98); }
+        .feedback { margin-top: 20px; font-size: 1.2rem; font-weight: bold; height: 30px; }
         .correct { color: var(--success); }
         .incorrect { color: var(--error); }
-        .level-badge { 
-            background: #3f3f46; 
-            padding: 4px 10px; 
-            border-radius: 20px; 
-            font-size: 0.8rem; 
-        }
+
+        /* Wiki */
+        .wiki { display: none; width: 100%; max-width: 600px; color: #d4d4d8; line-height: 1.6; padding-bottom: 40px; }
+        .wiki h2 { color: var(--primary); margin-bottom: 15px; margin-top: 30px; }
+        .wiki h3 { color: white; margin-bottom: 10px; margin-top: 20px; }
+        .wiki table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: var(--surface); border-radius: 8px; overflow: hidden; text-align: left; }
+        .wiki th, .wiki td { padding: 12px; border-bottom: 1px solid #3f3f46; }
+        .wiki th { background: #111; color: var(--primary); }
+        .wiki code { background: #111; padding: 2px 6px; border-radius: 4px; color: var(--primary); font-family: monospace; }
+        
+        .visible { display: block !important; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <header>
-        <div>Español ⚡️</div>
-        <div class="stats">
-            <span id="streakDisplay">🔥 0</span>
-            <span id="levelDisplay" class="level-badge">Lvl 1: -AR</span>
+        <div class="title">🇵🇾 Español PY</div>
+        <div class="nav-btns">
+            <button id="btnPractice" class="active">Practice</button>
+            <button id="btnWiki">Wiki</button>
         </div>
     </header>
 
-    <div class="card">
-        <div class="pronoun" id="pronoun">Yo</div>
-        <div class="infinitive" id="infinitive">hablar</div>
-        
-        <input type="text" id="answerInput" placeholder="Type here..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-        <button id="submitBtn">Check</button>
-        
-        <div class="feedback" id="feedback"></div>
+    <div class="container">
+        <div class="sidebar" id="verbList">
+            </div>
+
+        <div class="main-content">
+            
+            <div id="viewPractice" class="card">
+                <div class="meta-info">
+                    <span id="displayTense">Presente</span>
+                    <span id="displayLevel">Lvl 1</span>
+                </div>
+                <div class="pronoun" id="displayPronoun">Vos</div>
+                <div class="infinitive" id="displayInfinitive">hablar</div>
+                
+                <input type="text" id="answerInput" placeholder="Conjugate..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                <button id="submitBtn" class="submit-btn">Check</button>
+                
+                <div class="feedback" id="feedback"></div>
+            </div>
+
+            <div id="viewWiki" class="wiki">
+                <h2>Paraguayan Voseo Rules 🇵🇾</h2>
+                <p>In Paraguay, standard casual speech uses <code>vos</code> instead of <code>tú</code>. The plural is always <code>ustedes</code> (never vosotros).</p>
+                
+                <h3>Present Tense (Presente)</h3>
+                <p>Drop the -r, add an 's', and put the stress (tilde) on the final vowel. Note: Stem-changing verbs do <b>not</b> change for vos!</p>
+                <table>
+                    <tr><th>Type</th><th>Tú (General)</th><th>Vos (Paraguay)</th></tr>
+                    <tr><td>-AR (hablar)</td><td>tú hablas</td><td>vos hablás</td></tr>
+                    <tr><td>-ER (comer)</td><td>tú comes</td><td>vos comés</td></tr>
+                    <tr><td>-IR (vivir)</td><td>tú vives</td><td>vos vivís</td></tr>
+                    <tr><td>Stem (poder)</td><td>tú p<b>ue</b>des</td><td>vos p<b>o</b>dés</td></tr>
+                </table>
+
+                <h3>Past Tense (Pretérito)</h3>
+                <p>Identical to the standard 'tú' form, but standard Voseo dictates dropping the trailing 's'.</p>
+                <table>
+                    <tr><th>Ending</th><th>Vos Form</th><th>Example</th></tr>
+                    <tr><td>-AR</td><td>-aste</td><td>vos hablaste</td></tr>
+                    <tr><td>-ER / -IR</td><td>-iste</td><td>vos comiste</td></tr>
+                </table>
+
+                <h3>Imperfect (Imperfecto)</h3>
+                <p>Used for ongoing past actions or "used to". It is identical to the standard 'tú' conjugation.</p>
+                <table>
+                    <tr><th>Ending</th><th>Vos Form</th><th>Example</th></tr>
+                    <tr><td>-AR</td><td>-abas</td><td>vos hablabas</td></tr>
+                    <tr><td>-ER / -IR</td><td>-ías</td><td>vos comías</td></tr>
+                </table>
+            </div>
+
+        </div>
     </div>
 
     <script>
-        // Data & Rules
-        const pronouns = ["yo", "tú", "él/ella", "nosotros", "ellos/ellas"];
-        
-        const dictionary = {
-            1: [ // Level 1: Regular -AR (High Frequency)
-                { inf: "hablar", root: "habl", type: "ar" },
-                { inf: "trabajar", root: "trabaj", type: "ar" },
-                { inf: "estudiar", root: "estudi", type: "ar" },
-                { inf: "amar", root: "am", type: "ar" },
-                { inf: "ayudar", root: "ayud", type: "ar" },
-                { inf: "bailar", root: "bail", type: "ar" },
-                { inf: "caminar", root: "camin", type: "ar" },
-                { inf: "cantar", root: "cant", type: "ar" },
-                { inf: "cocinar", root: "cocin", type: "ar" },
-                { inf: "comprar", root: "compr", type: "ar" },
-                { inf: "escuchar", root: "escuch", type: "ar" },
-                { inf: "llegar", root: "lleg", type: "ar" },
-                { inf: "mirar", root: "mir", type: "ar" },
-                { inf: "nadar", root: "nad", type: "ar" },
-                { inf: "necesitar", root: "necesit", type: "ar" },
-                { inf: "pagar", root: "pag", type: "ar" },
-                { inf: "practicar", root: "practic", type: "ar" },
-                { inf: "tomar", root: "tom", type: "ar" },
-                { inf: "viajar", root: "viaj", type: "ar" }
-            ],
-            2: [ // Level 2: Regular -ER/-IR (High Frequency)
-                { inf: "comer", root: "com", type: "er" },
-                { inf: "beber", root: "beb", type: "er" },
-                { inf: "vivir", root: "viv", type: "ir" },
-                { inf: "escribir", root: "escrib", type: "ir" },
-                { inf: "abrir", root: "abr", type: "ir" },
-                { inf: "aprender", root: "aprend", type: "er" },
-                { inf: "comprender", root: "comprend", type: "er" },
-                { inf: "correr", root: "corr", type: "er" },
-                { inf: "creer", root: "cre", type: "er" },
-                { inf: "deber", root: "deb", type: "er" },
-                { inf: "decidir", root: "decid", type: "ir" },
-                { inf: "leer", root: "le", type: "er" },
-                { inf: "recibir", root: "recib", type: "ir" },
-                { inf: "responder", root: "respond", type: "er" },
-                { inf: "romper", root: "romp", type: "er" },
-                { inf: "vender", root: "vend", type: "er" },
-                { inf: "asistir", root: "asist", type: "ir" }
-            ],
-            3: [ // Level 3: The "Go" Verbs, Stem-Changers & Irregulars
-                { inf: "ser", type: "irr", forms: ["soy", "eres", "es", "somos", "son"] },
-                { inf: "estar", type: "irr", forms: ["estoy", "estás", "está", "estamos", "están"] },
-                { inf: "tener", type: "irr", forms: ["tengo", "tienes", "tiene", "tenemos", "tienen"] },
-                { inf: "ir", type: "irr", forms: ["voy", "vas", "va", "vamos", "van"] },
-                { inf: "hacer", type: "irr", forms: ["hago", "haces", "hace", "hacemos", "hacen"] },
-                { inf: "poder", type: "irr", forms: ["puedo", "puedes", "puede", "podemos", "pueden"] },
-                { inf: "querer", type: "irr", forms: ["quiero", "quieres", "quiere", "queremos", "quieren"] },
-                { inf: "decir", type: "irr", forms: ["digo", "dices", "dice", "decimos", "dicen"] },
-                { inf: "venir", type: "irr", forms: ["vengo", "vienes", "viene", "venimos", "vienen"] },
-                { inf: "saber", type: "irr", forms: ["sé", "sabes", "sabe", "sabemos", "saben"] },
-                { inf: "dar", type: "irr", forms: ["doy", "das", "da", "damos", "dan"] },
-                { inf: "salir", type: "irr", forms: ["salgo", "sales", "sale", "salimos", "salen"] },
-                { inf: "jugar", type: "irr", forms: ["juego", "juegas", "juega", "jugamos", "juegan"] },
-                { inf: "dormir", type: "irr", forms: ["duermo", "duermes", "duerme", "dormimos", "duermen"] },
-                { inf: "pensar", type: "irr", forms: ["pienso", "piensas", "piensa", "pensamos", "piensan"] }
-            ]
+        // Data & Linguistics Engine
+        const pronouns = ["yo", "vos", "él/ella", "nosotros", "ellos/ellas"];
+        const tenses = [
+            { id: "present", name: "Presente", req: 0 },
+            { id: "preterite", name: "Pretérito", req: 5 },
+            { id: "imperfect", name: "Imperfecto", req: 10 }
+        ];
+
+        // Core Verbs Data (High-frequency, explicitly mapping irregulars for foolproof accuracy)
+        const verbsDB = {
+            "hablar": { type: "ar", root: "habl" },
+            "comer": { type: "er", root: "com" },
+            "vivir": { type: "ir", root: "viv" },
+            "tomar": { type: "ar", root: "tom" }, // Common for drinking/taking in PY
+            "poder": { 
+                type: "irr",
+                present: ["puedo", "podés", "puede", "podemos", "pueden"], // Note: Voseo has no stem change!
+                preterite: ["pude", "pudiste", "pudo", "pudimos", "pudieron"],
+                imperfect: ["podía", "podías", "podía", "podíamos", "podían"]
+            },
+            "querer": {
+                type: "irr",
+                present: ["quiero", "querés", "quiere", "queremos", "quieren"], // Note: Voseo has no stem change!
+                preterite: ["quise", "quisiste", "quiso", "quisimos", "quisieron"],
+                imperfect: ["quería", "querías", "quería", "queríamos", "querían"]
+            },
+            "ser": {
+                type: "irr",
+                present: ["soy", "sos", "es", "somos", "son"],
+                preterite: ["fui", "fuiste", "fue", "fuimos", "fueron"],
+                imperfect: ["era", "eras", "era", "éramos", "eran"]
+            },
+            "estar": {
+                type: "irr",
+                present: ["estoy", "estás", "está", "estamos", "están"],
+                preterite: ["estuve", "estuviste", "estuvo", "estuvimos", "estuvieron"],
+                imperfect: ["estaba", "estabas", "estaba", "estábamos", "estaban"]
+            },
+            "ir": {
+                type: "irr",
+                present: ["voy", "vas", "va", "vamos", "van"],
+                preterite: ["fui", "fuiste", "fue", "fuimos", "fueron"],
+                imperfect: ["iba", "ibas", "iba", "íbamos", "iban"]
+            },
+            "hacer": {
+                type: "irr",
+                present: ["hago", "hacés", "hace", "hacemos", "hacen"],
+                preterite: ["hice", "hiciste", "hizo", "hicimos", "hicieron"],
+                imperfect: ["hacía", "hacías", "hacía", "hacíamos", "hacían"]
+            }
         };
 
-        const endings = {
-            "ar": ["o", "as", "a", "amos", "an"],
-            "er": ["o", "es", "e", "emos", "en"],
-            "ir": ["o", "es", "e", "imos", "en"]
+        const regularEndings = {
+            present: {
+                ar: ["o", "ás", "a", "amos", "an"],
+                er: ["o", "és", "e", "emos", "en"],
+                ir: ["o", "ís", "e", "imos", "en"]
+            },
+            preterite: {
+                ar: ["é", "aste", "ó", "amos", "aron"],
+                er: ["í", "iste", "ió", "imos", "ieron"],
+                ir: ["í", "iste", "ió", "imos", "ieron"]
+            },
+            imperfect: {
+                ar: ["aba", "abas", "aba", "ábamos", "aban"],
+                er: ["ía", "ías", "ía", "íamos", "ían"],
+                ir: ["ía", "ías", "ía", "íamos", "ían"]
+            }
         };
 
-        // State
+        // State & LocalStorage
+        let userData = JSON.parse(localStorage.getItem('pySpanishData')) || {};
+        // Initialize missing user data
+        Object.keys(verbsDB).forEach(v => {
+            if (!userData[v]) userData[v] = { streak: 0 };
+        });
+
         let state = {
-            streak: 0,
-            level: 1,
-            currentVerb: null,
+            currentVerb: "hablar",
+            currentTense: null,
             currentPronounIdx: 0,
             correctAnswer: ""
         };
 
         // DOM Elements
-        const elPronoun = document.getElementById('pronoun');
-        const elInfinitive = document.getElementById('infinitive');
+        const elVerbList = document.getElementById('verbList');
+        const elDisplayTense = document.getElementById('displayTense');
+        const elDisplayLevel = document.getElementById('displayLevel');
+        const elPronoun = document.getElementById('displayPronoun');
+        const elInfinitive = document.getElementById('displayInfinitive');
         const elInput = document.getElementById('answerInput');
         const elSubmit = document.getElementById('submitBtn');
         const elFeedback = document.getElementById('feedback');
-        const elStreak = document.getElementById('streakDisplay');
-        const elLevel = document.getElementById('levelDisplay');
 
         // Logic
-        function getConjugation(verb, pIdx) {
-            if (verb.type === "irr") return verb.forms[pIdx];
-            return verb.root + endings[verb.type][pIdx];
+        function saveData() {
+            localStorage.setItem('pySpanishData', JSON.stringify(userData));
         }
 
-        function evaluateLevel() {
-            if (state.streak >= 15) { 
-                state.level = 3; 
-                elLevel.innerText = "Lvl 3: Irregulars"; 
-            } else if (state.streak >= 7) { 
-                state.level = 2; 
-                elLevel.innerText = "Lvl 2: -ER/-IR"; 
-            } else { 
-                state.level = 1; 
-                elLevel.innerText = "Lvl 1: -AR"; 
-            }
+        function getConjugation(verbInf, tenseId, pIdx) {
+            const verbData = verbsDB[verbInf];
+            if (verbData.type === "irr") return verbData[tenseId][pIdx];
+            return verbData.root + regularEndings[tenseId][verbData.type][pIdx];
+        }
+
+        function renderSidebar() {
+            elVerbList.innerHTML = "";
+            Object.keys(verbsDB).forEach(v => {
+                const streak = userData[v].streak;
+                let level = 1;
+                if (streak >= 10) level = 3;
+                else if (streak >= 5) level = 2;
+
+                const div = document.createElement('div');
+                div.className = `verb-chip ${v === state.currentVerb ? 'selected' : ''}`;
+                div.innerHTML = `<span>${v}</span> <span class="chip-streak">🔥 ${streak} (L${level})</span>`;
+                div.onclick = () => {
+                    state.currentVerb = v;
+                    renderSidebar();
+                    generateQuestion();
+                };
+                elVerbList.appendChild(div);
+            });
         }
 
         function generateQuestion() {
-            evaluateLevel();
+            const streak = userData[state.currentVerb].streak;
             
-            // Pick a verb from available levels (pool includes current and previous levels)
-            let availableVerbs = [];
-            for (let i = 1; i <= state.level; i++) {
-                availableVerbs = availableVerbs.concat(dictionary[i]);
-            }
-            
-            state.currentVerb = availableVerbs[Math.floor(Math.random() * availableVerbs.length)];
-            state.currentPronounIdx = Math.floor(Math.random() * pronouns.length);
-            state.correctAnswer = getConjugation(state.currentVerb, state.currentPronounIdx);
+            // Determine available tenses for this verb
+            let availableTenses = [tenses[0]]; // Present
+            if (streak >= tenses[1].req) availableTenses.push(tenses[1]); // Preterite
+            if (streak >= tenses[2].req) availableTenses.push(tenses[2]); // Imperfect
 
+            const selectedTense = availableTenses[Math.floor(Math.random() * availableTenses.length)];
+            state.currentTense = selectedTense;
+            state.currentPronounIdx = Math.floor(Math.random() * pronouns.length);
+            state.correctAnswer = getConjugation(state.currentVerb, selectedTense.id, state.currentPronounIdx);
+
+            // Update UI
+            elDisplayTense.innerText = selectedTense.name;
+            elDisplayLevel.innerText = `Streak: ${streak}`;
             elPronoun.innerText = pronouns[state.currentPronounIdx].toUpperCase();
-            elInfinitive.innerText = state.currentVerb.inf;
+            elInfinitive.innerText = state.currentVerb;
             elInput.value = "";
             elInput.focus();
         }
@@ -261,37 +284,43 @@
             if (!userAnswer) return;
 
             if (userAnswer === state.correctAnswer) {
-                state.streak++;
-                elFeedback.innerText = "¡Correcto!";
+                userData[state.currentVerb].streak++;
+                elFeedback.innerText = "¡Excelente!";
                 elFeedback.className = "feedback correct";
-                setTimeout(() => { 
-                    elFeedback.innerText = ""; 
-                    generateQuestion(); 
-                }, 800);
+                saveData();
+                renderSidebar(); // Update streaks in UI
+                setTimeout(() => { elFeedback.innerText = ""; generateQuestion(); }, 800);
             } else {
-                state.streak = Math.max(0, state.streak - 2); // Harsh penalty for learning
-                elFeedback.innerText = `No. ${state.correctAnswer}`;
+                userData[state.currentVerb].streak = Math.max(0, userData[state.currentVerb].streak - 2); // Penalty
+                elFeedback.innerText = `No. Es: ${state.correctAnswer}`;
                 elFeedback.className = "feedback incorrect";
-                setTimeout(() => { 
-                    elFeedback.innerText = ""; 
-                    generateQuestion(); 
-                }, 2000);
+                saveData();
+                renderSidebar();
+                setTimeout(() => { elFeedback.innerText = ""; generateQuestion(); }, 2500);
             }
-            elStreak.innerText = `🔥 ${state.streak}`;
         }
+
+        // Nav Logic
+        document.getElementById('btnPractice').onclick = (e) => {
+            e.target.classList.add('active');
+            document.getElementById('btnWiki').classList.remove('active');
+            document.getElementById('viewPractice').classList.remove('hidden');
+            document.getElementById('viewWiki').classList.remove('visible');
+        };
+
+        document.getElementById('btnWiki').onclick = (e) => {
+            e.target.classList.add('active');
+            document.getElementById('btnPractice').classList.remove('active');
+            document.getElementById('viewPractice').classList.add('hidden');
+            document.getElementById('viewWiki').classList.add('visible');
+        };
 
         // Event Listeners
         elSubmit.addEventListener('click', checkAnswer);
-        elInput.addEventListener('keypress', (e) => { 
-            if (e.key === 'Enter') checkAnswer(); 
-        });
-
-        // PWA Setup
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(console.error);
-        }
+        elInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') checkAnswer(); });
 
         // Init
+        renderSidebar();
         generateQuestion();
     </script>
 </body>
