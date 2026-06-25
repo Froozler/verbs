@@ -48,8 +48,17 @@
         .pronoun { font-size: 1.2rem; color: var(--primary); margin-bottom: 2px; font-weight: bold; }
         .infinitive { font-size: 2rem; font-weight: 800; margin-bottom: 20px; letter-spacing: -1px; }
         
+        /* The Anti-Autofill Hack:
+           type="search" stops Chrome Android from injecting card/password prompts.
+           The CSS below removes the default 'x' clear button that search inputs normally have.
+        */
         input { width: 100%; background: var(--bg); border: 2px solid #3f3f46; color: white; padding: 12px; font-size: 1.2rem; border-radius: 8px; text-align: center; outline: none; margin-bottom: 15px; }
         input:focus { border-color: var(--primary); }
+        input[type="search"]::-webkit-search-decoration,
+        input[type="search"]::-webkit-search-cancel-button,
+        input[type="search"]::-webkit-search-results-button,
+        input[type="search"]::-webkit-search-results-decoration { -webkit-appearance: none; }
+        
         .submit-btn { width: 100%; background: var(--primary); color: #000; font-weight: bold; font-size: 1.2rem; padding: 12px; border: none; border-radius: 8px; cursor: pointer; }
         
         .feedback { margin-top: 15px; min-height: 60px; font-size: 1rem; text-align: left; background: #111; padding: 10px; border-radius: 8px; display: none; }
@@ -77,7 +86,6 @@
         .tense-row:last-child { border-bottom: none; }
         .tense-pro { width: 40%; color: #a1a1aa; font-weight: bold; }
         .tense-conj { width: 60%; color: white; }
-        .irr-highlight { color: var(--primary); font-weight: bold; }
 
         .visible { display: flex !important; }
         .hidden { display: none !important; }
@@ -112,7 +120,7 @@
             <div class="pronoun" id="displayPronoun">Vos</div>
             <div class="infinitive" id="displayInfinitive">hablar</div>
             
-            <input type="text" id="answerInput" name="dummy-random-name" autocomplete="new-password" placeholder="Conjugate..." spellcheck="false" autocorrect="off" autocapitalize="off">
+            <input type="search" id="answerInput" name="espy_answer_qval" autocomplete="off" placeholder="Conjugate..." spellcheck="false" autocorrect="off" autocapitalize="none" data-lpignore="true">
             <button id="submitBtn" class="submit-btn">Check</button>
             
             <div class="feedback" id="feedback">
@@ -140,27 +148,22 @@
         // Linguistics Engine
         const pronouns = ["yo", "vos", "él/ella", "nosotros", "ellos/ellas"];
         
-        // Progression Mechanics: Tenses unlock based on a VERB's individual streak
         const tenses = [
             { id: "present", name: "Presente", req: 0 },
             { id: "preterite", name: "Pretérito", req: 5 },
             { id: "imperfect", name: "Imperfecto", req: 10 },
             { id: "future", name: "Futuro", req: 15 },
             { id: "conditional", name: "Condicional", req: 20 },
-            { id: "subjunctive", name: "Subjuntivo", req: 25 } // Wants/Doubts
+            { id: "subjunctive", name: "Subjuntivo", req: 25 }
         ];
 
-        // Verbs Dictionary with algorithmic pacing (unlockReq) based on GLOBAL score
         const verbsDB = {
-            // Stage 1: Regular AR
             "hablar": { trans: "to speak", type: "ar", root: "habl", unlockReq: 0, desc: "A standard regular -AR verb. Master this to learn the baseline pattern for all -ar verbs.", obj: "español" },
             "tomar": { trans: "to take / to drink", type: "ar", root: "tom", unlockReq: 0, desc: "Standard -AR verb. Extremely common in Paraguay for drinking Tereré or taking transport.", obj: "tereré" },
             
-            // Stage 2: Regular ER/IR
             "comer": { trans: "to eat", type: "er", root: "com", unlockReq: 10, desc: "Standard regular -ER verb. Notice how the endings shift from 'a' to 'e'.", obj: "chipa" },
             "vivir": { trans: "to live", type: "ir", root: "viv", unlockReq: 10, desc: "Standard regular -IR verb. Very similar to -ER verbs, but notice the 'vos' form (vivís).", obj: "acá" },
             
-            // Stage 3: Common Stem-Changers & Irregulars
             "poder": { 
                 trans: "to be able to (can)", type: "irr", unlockReq: 25, futRoot: "podr", obj: "hacerlo",
                 desc: "Stem-changing verb (o -> ue). IMPORTANT: In Paraguayan Voseo, 'vos' does NOT stem-change in the present tense (vos podés).",
@@ -178,7 +181,6 @@
                 subjunctive: ["quiera", "quieras", "quiera", "queramos", "quieran"]
             },
             
-            // Stage 4: Highly Irregular Core
             "ser": {
                 trans: "to be (identity/permanent)", type: "irr", unlockReq: 40, obj: "paraguayo",
                 desc: "Highly irregular. Used for identity, origin, and permanent characteristics.",
@@ -211,23 +213,22 @@
             imperfect: { ar: ["aba", "abas", "aba", "ábamos", "aban"], er: ["ía", "ías", "ía", "íamos", "ían"], ir: ["ía", "ías", "ía", "íamos", "ían"] },
             future: ["é", "ás", "á", "emos", "án"],
             conditional: ["ía", "ías", "ía", "íamos", "ían"],
-            subjunctive: { ar: ["e", "és", "e", "emos", "en"], er: ["a", "ás", "a", "amos", "an"], ir: ["a", "ás", "a", "amos", "an"] } // Voseo Subjunctive
+            subjunctive: { ar: ["e", "és", "e", "emos", "en"], er: ["a", "ás", "a", "amos", "an"], ir: ["a", "ás", "a", "amos", "an"] }
         };
 
         // Storage & Decay
-        let userData = JSON.parse(localStorage.getItem('pySpanishV3')) || { lastActive: new Date().toDateString(), verbs: {} };
+        let userData = JSON.parse(localStorage.getItem('pySpanishV4')) || { lastActive: new Date().toDateString(), verbs: {} };
         Object.keys(verbsDB).forEach(v => { if (!userData.verbs[v]) userData.verbs[v] = { streak: 0 }; });
 
         let today = new Date().toDateString();
         if (userData.lastActive !== today) {
             Object.keys(verbsDB).forEach(v => { userData.verbs[v].streak = Math.max(0, userData.verbs[v].streak - 2); });
             userData.lastActive = today;
-            localStorage.setItem('pySpanishV3', JSON.stringify(userData));
+            localStorage.setItem('pySpanishV4', JSON.stringify(userData));
         }
 
         let state = { currentVerb: "hablar", currentTense: null, currentPronounIdx: 0, correctAnswer: "", globalScore: 0 };
 
-        // DOM Setup
         const elInput = document.getElementById('answerInput');
         const elFeedback = document.getElementById('feedback');
 
@@ -256,7 +257,6 @@
                 const isLocked = state.globalScore < data.unlockReq;
                 const streak = userData.verbs[v].streak;
                 
-                // Build Sidebar Chips
                 const div = document.createElement('div');
                 div.className = `verb-chip ${v === state.currentVerb ? 'selected' : ''} ${isLocked ? 'locked' : ''}`;
                 if (isLocked) {
@@ -267,7 +267,6 @@
                 }
                 elVerbList.appendChild(div);
 
-                // Build Wiki Select Options (allow viewing locked verbs for study)
                 const opt = document.createElement('option');
                 opt.value = v; opt.innerText = isLocked ? `🔒 ${v} (Locked)` : `${v} (🔥 ${streak})`;
                 elWikiSelect.appendChild(opt);
@@ -323,7 +322,7 @@
                 userData.verbs[state.currentVerb].streak++;
                 elFeedback.innerHTML = `<div class="fb-title">${titleText}</div>`;
                 elFeedback.classList.add(feedbackType);
-                localStorage.setItem('pySpanishV3', JSON.stringify(userData));
+                localStorage.setItem('pySpanishV4', JSON.stringify(userData));
                 renderSidebar();
                 setTimeout(() => generateQuestion(), 1000);
             } else {
@@ -337,13 +336,13 @@
                     <div class="fb-example">Ejemplo: ${p.charAt(0).toUpperCase() + p.slice(1)} ${rawCorrect} ${obj}.</div>
                 `;
                 elFeedback.classList.add(feedbackType);
-                localStorage.setItem('pySpanishV3', JSON.stringify(userData));
+                localStorage.setItem('pySpanishV4', JSON.stringify(userData));
                 renderSidebar();
             }
         }
 
-        // --- Dynamic Wiki Renderer ---
         function renderWikiView(verbInf) {
+            if (!verbInf) verbInf = state.currentVerb; // Fallback safety
             const v = verbsDB[verbInf];
             document.getElementById('wikiInfinitive').innerText = verbInf;
             document.getElementById('wikiTranslation').innerText = `"${v.trans}"`;
@@ -359,7 +358,6 @@
                 `;
                 pronouns.forEach((p, idx) => {
                     const conj = getConjugation(verbInf, t.id, idx);
-                    // Bold if it's irregular logic, for simplicity we just print it clean
                     html += `
                         <div class="tense-row">
                             <div class="tense-pro">${p}</div>
@@ -377,13 +375,14 @@
             e.target.classList.add('active'); document.getElementById('btnWiki').classList.remove('active');
             document.getElementById('viewPractice').classList.remove('hidden'); document.getElementById('viewWiki').classList.remove('visible');
             document.getElementById('topMenu').classList.remove('open');
-            generateQuestion(); // Refresh UI in case of verb switch
+            generateQuestion(); 
         };
         
         document.getElementById('btnWiki').onclick = (e) => {
             e.target.classList.add('active'); document.getElementById('btnPractice').classList.remove('active');
             document.getElementById('viewPractice').classList.add('hidden'); document.getElementById('viewWiki').classList.add('visible');
             document.getElementById('topMenu').classList.remove('open');
+            // Ensure we are rendering what is currently selected in the dropdown
             renderWikiView(document.getElementById('wikiVerbSelect').value);
         };
 
@@ -393,8 +392,10 @@
         document.getElementById('submitBtn').addEventListener('click', checkAnswer);
         elInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') checkAnswer(); });
 
+        // Init Flow
         renderSidebar();
         generateQuestion();
+        renderWikiView(state.currentVerb); // Pre-render the wiki in the background to prevent blank loading!
     </script>
 </body>
 </html>
