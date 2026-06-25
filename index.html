@@ -48,17 +48,16 @@
         .pronoun { font-size: 1.2rem; color: var(--primary); margin-bottom: 2px; font-weight: bold; }
         .infinitive { font-size: 2rem; font-weight: 800; margin-bottom: 20px; letter-spacing: -1px; }
         
-        /* The Anti-Autofill Hack:
-           type="search" stops Chrome Android from injecting card/password prompts.
-           The CSS below removes the default 'x' clear button that search inputs normally have.
-        */
-        input { width: 100%; background: var(--bg); border: 2px solid #3f3f46; color: white; padding: 12px; font-size: 1.2rem; border-radius: 8px; text-align: center; outline: none; margin-bottom: 15px; }
-        input:focus { border-color: var(--primary); }
-        input[type="search"]::-webkit-search-decoration,
-        input[type="search"]::-webkit-search-cancel-button,
-        input[type="search"]::-webkit-search-results-button,
-        input[type="search"]::-webkit-search-results-decoration { -webkit-appearance: none; }
-        
+        /* Fake Input for Chrome Android Autofill Evasion */
+        .fake-input { 
+            width: 100%; background: var(--bg); border: 2px solid #3f3f46; color: white; 
+            padding: 12px; font-size: 1.2rem; border-radius: 8px; text-align: center; 
+            outline: none; margin-bottom: 15px; cursor: text;
+            white-space: nowrap; overflow: hidden; min-height: 52px;
+        }
+        .fake-input:focus { border-color: var(--primary); }
+        .fake-input:empty:before { content: attr(placeholder); color: #71717a; pointer-events: none; display: block; }
+
         .submit-btn { width: 100%; background: var(--primary); color: #000; font-weight: bold; font-size: 1.2rem; padding: 12px; border: none; border-radius: 8px; cursor: pointer; }
         
         .feedback { margin-top: 15px; min-height: 60px; font-size: 1rem; text-align: left; background: #111; padding: 10px; border-radius: 8px; display: none; }
@@ -70,19 +69,19 @@
         .fb-rule { font-size: 0.85rem; color: #a1a1aa; margin-bottom: 4px; }
         .fb-example { font-size: 0.85rem; color: white; font-style: italic; }
 
-        /* Dynamic Wiki View */
-        .wiki { display: none; width: 100%; max-width: 600px; color: #d4d4d8; padding-bottom: 40px; }
+        /* Static Page Wiki View */
+        .wiki { display: none; width: 100%; max-width: 600px; color: #d4d4d8; padding-bottom: 40px; flex-direction: column; }
+        .wiki-context-label { font-size: 0.8rem; color: var(--primary); text-transform: uppercase; font-weight: bold; margin-bottom: 10px; letter-spacing: 1px; }
         .wiki-header { margin-bottom: 20px; border-bottom: 1px solid var(--surface-hover); padding-bottom: 15px; }
-        .wiki-header h2 { color: var(--primary); font-size: 2rem; margin-bottom: 5px; text-transform: capitalize; }
-        .wiki-translation { font-size: 1.1rem; color: white; font-weight: bold; margin-bottom: 10px; }
-        .wiki-desc { font-size: 0.9rem; line-height: 1.5; color: #a1a1aa; }
-        .wiki-select { width: 100%; padding: 10px; background: var(--surface); color: white; border: 1px solid var(--primary); border-radius: 8px; margin-bottom: 20px; font-size: 1rem; outline: none; }
+        .wiki-header h2 { color: white; font-size: 2.5rem; margin-bottom: 5px; letter-spacing: -1px; }
+        .wiki-translation { font-size: 1.2rem; color: var(--primary); font-weight: bold; margin-bottom: 10px; }
+        .wiki-desc { font-size: 0.95rem; line-height: 1.6; color: #a1a1aa; }
         
         .wiki-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
         @media (min-width: 600px) { .wiki-grid { grid-template-columns: 1fr 1fr; } }
-        .tense-table { background: var(--surface); border-radius: 8px; overflow: hidden; font-size: 0.9rem; }
-        .tense-table-header { background: #111; padding: 8px 12px; font-weight: bold; color: var(--primary); display: flex; justify-content: space-between; border-bottom: 1px solid #222; }
-        .tense-row { display: flex; padding: 6px 12px; border-bottom: 1px solid #3f3f46; }
+        .tense-table { background: var(--surface); border-radius: 8px; overflow: hidden; font-size: 0.9rem; border: 1px solid #333; }
+        .tense-table-header { background: #111; padding: 10px 12px; font-weight: bold; color: var(--primary); display: flex; justify-content: space-between; border-bottom: 1px solid #333; }
+        .tense-row { display: flex; padding: 8px 12px; border-bottom: 1px solid #3f3f46; }
         .tense-row:last-child { border-bottom: none; }
         .tense-pro { width: 40%; color: #a1a1aa; font-weight: bold; }
         .tense-conj { width: 60%; color: white; }
@@ -101,7 +100,7 @@
     <div id="topMenu">
         <div class="menu-controls">
             <button id="btnPractice" class="active">Practice</button>
-            <button id="btnWiki">Dynamic Wiki</button>
+            <button id="btnWiki">Reference Page</button>
         </div>
         <label class="toggle-label">
             <input type="checkbox" id="strictAccentsToggle"> Strict Accents (Require á, é, í, ó, ú)
@@ -120,7 +119,8 @@
             <div class="pronoun" id="displayPronoun">Vos</div>
             <div class="infinitive" id="displayInfinitive">hablar</div>
             
-            <input type="search" id="answerInput" name="espy_answer_qval" autocomplete="off" placeholder="Conjugate..." spellcheck="false" autocorrect="off" autocapitalize="none" data-lpignore="true">
+            <div id="answerInput" contenteditable="true" class="fake-input" placeholder="Conjugate..." spellcheck="false" translate="no"></div>
+            
             <button id="submitBtn" class="submit-btn">Check</button>
             
             <div class="feedback" id="feedback">
@@ -130,13 +130,12 @@
             </div>
         </div>
 
-        <div id="viewWiki" class="wiki hidden" style="flex-direction: column;">
-            <select class="wiki-select" id="wikiVerbSelect"></select>
-            
+        <div id="viewWiki" class="wiki hidden">
+            <div class="wiki-context-label">Verb Reference Card</div>
             <div class="wiki-header">
-                <h2 id="wikiInfinitive">hablar</h2>
-                <div class="wiki-translation" id="wikiTranslation">to speak</div>
-                <div class="wiki-desc" id="wikiDesc">Regular -AR verb.</div>
+                <h2 id="wikiInfinitive">...</h2>
+                <div class="wiki-translation" id="wikiTranslation">...</div>
+                <div class="wiki-desc" id="wikiDesc">...</div>
             </div>
 
             <div class="wiki-grid" id="wikiGrid">
@@ -160,10 +159,8 @@
         const verbsDB = {
             "hablar": { trans: "to speak", type: "ar", root: "habl", unlockReq: 0, desc: "A standard regular -AR verb. Master this to learn the baseline pattern for all -ar verbs.", obj: "español" },
             "tomar": { trans: "to take / to drink", type: "ar", root: "tom", unlockReq: 0, desc: "Standard -AR verb. Extremely common in Paraguay for drinking Tereré or taking transport.", obj: "tereré" },
-            
             "comer": { trans: "to eat", type: "er", root: "com", unlockReq: 10, desc: "Standard regular -ER verb. Notice how the endings shift from 'a' to 'e'.", obj: "chipa" },
             "vivir": { trans: "to live", type: "ir", root: "viv", unlockReq: 10, desc: "Standard regular -IR verb. Very similar to -ER verbs, but notice the 'vos' form (vivís).", obj: "acá" },
-            
             "poder": { 
                 trans: "to be able to (can)", type: "irr", unlockReq: 25, futRoot: "podr", obj: "hacerlo",
                 desc: "Stem-changing verb (o -> ue). IMPORTANT: In Paraguayan Voseo, 'vos' does NOT stem-change in the present tense (vos podés).",
@@ -180,7 +177,6 @@
                 imperfect: ["quería", "querías", "quería", "queríamos", "querían"],
                 subjunctive: ["quiera", "quieras", "quiera", "queramos", "quieran"]
             },
-            
             "ser": {
                 trans: "to be (identity/permanent)", type: "irr", unlockReq: 40, obj: "paraguayo",
                 desc: "Highly irregular. Used for identity, origin, and permanent characteristics.",
@@ -217,14 +213,14 @@
         };
 
         // Storage & Decay
-        let userData = JSON.parse(localStorage.getItem('pySpanishV4')) || { lastActive: new Date().toDateString(), verbs: {} };
+        let userData = JSON.parse(localStorage.getItem('pySpanishV6')) || { lastActive: new Date().toDateString(), verbs: {} };
         Object.keys(verbsDB).forEach(v => { if (!userData.verbs[v]) userData.verbs[v] = { streak: 0 }; });
 
         let today = new Date().toDateString();
         if (userData.lastActive !== today) {
             Object.keys(verbsDB).forEach(v => { userData.verbs[v].streak = Math.max(0, userData.verbs[v].streak - 2); });
             userData.lastActive = today;
-            localStorage.setItem('pySpanishV4', JSON.stringify(userData));
+            localStorage.setItem('pySpanishV6', JSON.stringify(userData));
         }
 
         let state = { currentVerb: "hablar", currentTense: null, currentPronounIdx: 0, correctAnswer: "", globalScore: 0 };
@@ -250,8 +246,7 @@
         function renderSidebar() {
             calculateGlobalScore();
             const elVerbList = document.getElementById('verbList');
-            const elWikiSelect = document.getElementById('wikiVerbSelect');
-            elVerbList.innerHTML = ""; elWikiSelect.innerHTML = "";
+            elVerbList.innerHTML = "";
 
             Object.entries(verbsDB).forEach(([v, data]) => {
                 const isLocked = state.globalScore < data.unlockReq;
@@ -263,15 +258,15 @@
                     div.innerHTML = `🔒 ${v} <span class="chip-streak">Req: ${data.unlockReq}</span>`;
                 } else {
                     div.innerHTML = `${v} <span class="chip-streak">🔥 ${streak}</span>`;
-                    div.onclick = () => { state.currentVerb = v; renderSidebar(); generateQuestion(); };
+                    div.onclick = () => { 
+                        state.currentVerb = v; 
+                        renderSidebar(); 
+                        generateQuestion(); 
+                        renderStaticWiki(); // Automatically update the background wiki page
+                    };
                 }
                 elVerbList.appendChild(div);
-
-                const opt = document.createElement('option');
-                opt.value = v; opt.innerText = isLocked ? `🔒 ${v} (Locked)` : `${v} (🔥 ${streak})`;
-                elWikiSelect.appendChild(opt);
             });
-            elWikiSelect.value = state.currentVerb;
         }
 
         function generateQuestion() {
@@ -287,7 +282,7 @@
             document.getElementById('displayPronoun').innerText = pronouns[state.currentPronounIdx].toUpperCase();
             document.getElementById('displayInfinitive').innerText = state.currentVerb;
             
-            elInput.value = "";
+            elInput.innerText = "";
             elFeedback.className = "feedback";
             elInput.focus();
         }
@@ -301,7 +296,7 @@
         }
 
         function checkAnswer() {
-            const rawUser = elInput.value.trim().toLowerCase();
+            const rawUser = elInput.innerText.trim().toLowerCase();
             const rawCorrect = state.correctAnswer.toLowerCase();
             if (!rawUser) return;
 
@@ -322,7 +317,7 @@
                 userData.verbs[state.currentVerb].streak++;
                 elFeedback.innerHTML = `<div class="fb-title">${titleText}</div>`;
                 elFeedback.classList.add(feedbackType);
-                localStorage.setItem('pySpanishV4', JSON.stringify(userData));
+                localStorage.setItem('pySpanishV6', JSON.stringify(userData));
                 renderSidebar();
                 setTimeout(() => generateQuestion(), 1000);
             } else {
@@ -336,13 +331,13 @@
                     <div class="fb-example">Ejemplo: ${p.charAt(0).toUpperCase() + p.slice(1)} ${rawCorrect} ${obj}.</div>
                 `;
                 elFeedback.classList.add(feedbackType);
-                localStorage.setItem('pySpanishV4', JSON.stringify(userData));
+                localStorage.setItem('pySpanishV6', JSON.stringify(userData));
                 renderSidebar();
             }
         }
 
-        function renderWikiView(verbInf) {
-            if (!verbInf) verbInf = state.currentVerb; // Fallback safety
+        function renderStaticWiki() {
+            const verbInf = state.currentVerb;
             const v = verbsDB[verbInf];
             document.getElementById('wikiInfinitive').innerText = verbInf;
             document.getElementById('wikiTranslation').innerText = `"${v.trans}"`;
@@ -354,7 +349,7 @@
             tenses.forEach(t => {
                 let html = `
                     <div class="tense-table">
-                        <div class="tense-table-header"><span>${t.name}</span> <span style="color:#52525b; font-size:0.8rem">Req: 🔥${t.req}</span></div>
+                        <div class="tense-table-header"><span>${t.name}</span> <span style="color:#52525b; font-size:0.8rem">Unlock: 🔥${t.req}</span></div>
                 `;
                 pronouns.forEach((p, idx) => {
                     const conj = getConjugation(verbInf, t.id, idx);
@@ -373,29 +368,33 @@
         // Nav
         document.getElementById('btnPractice').onclick = (e) => {
             e.target.classList.add('active'); document.getElementById('btnWiki').classList.remove('active');
-            document.getElementById('viewPractice').classList.remove('hidden'); document.getElementById('viewWiki').classList.remove('visible');
+            document.getElementById('viewPractice').classList.remove('hidden'); document.getElementById('viewWiki').classList.add('hidden');
             document.getElementById('topMenu').classList.remove('open');
             generateQuestion(); 
         };
         
         document.getElementById('btnWiki').onclick = (e) => {
             e.target.classList.add('active'); document.getElementById('btnPractice').classList.remove('active');
-            document.getElementById('viewPractice').classList.add('hidden'); document.getElementById('viewWiki').classList.add('visible');
+            document.getElementById('viewPractice').classList.add('hidden'); document.getElementById('viewWiki').classList.remove('hidden');
             document.getElementById('topMenu').classList.remove('open');
-            // Ensure we are rendering what is currently selected in the dropdown
-            renderWikiView(document.getElementById('wikiVerbSelect').value);
+            renderStaticWiki(); // Just in case it missed a state change
         };
-
-        document.getElementById('wikiVerbSelect').addEventListener('change', (e) => { renderWikiView(e.target.value); });
 
         // Listeners
         document.getElementById('submitBtn').addEventListener('click', checkAnswer);
-        elInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') checkAnswer(); });
+        
+        // Handle Enter key for the contenteditable div
+        elInput.addEventListener('keydown', (e) => { 
+            if (e.key === 'Enter') {
+                e.preventDefault(); 
+                checkAnswer(); 
+            }
+        });
 
         // Init Flow
         renderSidebar();
         generateQuestion();
-        renderWikiView(state.currentVerb); // Pre-render the wiki in the background to prevent blank loading!
+        renderStaticWiki(); // Pre-load the active verb's static page
     </script>
 </body>
 </html>
