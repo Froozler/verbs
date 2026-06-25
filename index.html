@@ -10,6 +10,8 @@
             --bg: #111;
             --bg-alt: #1a1a1c;
             --text: #f4f4f5;
+            
+            /* UI Colors */
             --primary: #fbbf24;
             --error: #ef4444;
             --warning: #f97316;
@@ -17,6 +19,14 @@
             --surface: #27272a;
             --surface-hover: #3f3f46;
             --locked: #52525b;
+
+            /* Tense Colors */
+            --t-present: #fbbf24;    /* Yellow */
+            --t-preterite: #a855f7;  /* Purple */
+            --t-imperfect: #3b82f6;  /* Blue */
+            --t-future: #22c55e;     /* Green */
+            --t-conditional: #f97316;/* Orange */
+            --t-subjunctive: #ef4444;/* Red */
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         body { background: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
@@ -50,9 +60,13 @@
         
         /* PRACTICE VIEW */
         #viewPractice { width: 100%; max-width: 450px; display: flex; flex-direction: column; align-items: center; }
-        .card { background: var(--surface); width: 100%; padding: 30px 20px; border-radius: 16px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .card { background: var(--surface); width: 100%; padding: 30px 20px; border-radius: 16px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-top: 4px solid var(--primary); transition: border-color 0.3s ease; }
         .meta-info { display: flex; justify-content: space-between; font-size: 0.85rem; color: #a1a1aa; margin-bottom: 20px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
-        .pronoun { font-size: 1.3rem; color: var(--primary); margin-bottom: 4px; font-weight: bold; }
+        
+        /* Dynamic Tense Text */
+        #displayTense { color: var(--primary); font-weight: 900; transition: color 0.3s ease; }
+        
+        .pronoun { font-size: 1.3rem; color: #d4d4d8; margin-bottom: 4px; font-weight: bold; }
         .infinitive { font-size: 2.2rem; font-weight: 800; margin-bottom: 25px; letter-spacing: -1px; }
         
         /* ContentEditable Fake Input */
@@ -60,7 +74,8 @@
         .fake-input:focus { border-color: var(--primary); }
         .fake-input:empty:before { content: attr(placeholder); color: #52525b; pointer-events: none; display: block; font-weight: normal; }
 
-        .submit-btn { width: 100%; background: var(--primary); color: #000; font-weight: bold; font-size: 1.2rem; padding: 15px; border: none; border-radius: 8px; cursor: pointer; transition: transform 0.1s; }
+        /* Dynamic Submit Button */
+        .submit-btn { width: 100%; background: var(--primary); color: #000; font-weight: bold; font-size: 1.2rem; padding: 15px; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease, color 0.3s ease, transform 0.1s; }
         .submit-btn:active { transform: scale(0.98); }
         
         .feedback { margin-top: 15px; min-height: 70px; font-size: 1rem; text-align: left; background: #111; padding: 15px; border-radius: 8px; display: none; width: 100%; }
@@ -96,7 +111,6 @@
         .tense-list li.is-vos { background: #222; margin: -2px -10px; padding: 4px 10px; border-radius: 6px; border-left: 2px solid var(--primary); }
         .tense-list li.is-vos .pro { color: var(--primary); }
 
-        /* Utility */
         .active-view { display: flex !important; }
     </style>
 </head>
@@ -123,6 +137,7 @@
                 <option value="2">2x (Normal)</option>
                 <option value="3">3x (Slow)</option>
                 <option value="5">5x (Grind)</option>
+                <option value="10">10x (Grindset)</option>
             </select>
         </div>
     </div>
@@ -132,7 +147,7 @@
     <div class="main-content">
         
         <div id="viewPractice" class="active-view">
-            <div class="card">
+            <div class="card" id="practiceCard">
                 <div class="meta-info">
                     <span id="displayTense">Presente</span>
                     <span id="displayLevel">Streak: 0</span>
@@ -158,8 +173,7 @@
                 <div class="translation" id="refTranslation">...</div>
                 <div class="desc" id="refDesc">...</div>
             </div>
-            <div class="ref-grid" id="refGrid">
-                </div>
+            <div class="ref-grid" id="refGrid"></div>
         </div>
 
     </div>
@@ -168,13 +182,14 @@
         // Core Data
         const pronouns = ["yo", "vos", "él/ella", "nosotros", "ellos/ellas"];
         
+        // Dynamic Tense Colors mapped to CSS variables
         const tenses = [
-            { id: "present", name: "Presente", req: 0 },
-            { id: "preterite", name: "Pretérito", req: 5 },
-            { id: "imperfect", name: "Imperfecto", req: 10 },
-            { id: "future", name: "Futuro", req: 15 },
-            { id: "conditional", name: "Condicional", req: 20 },
-            { id: "subjunctive", name: "Subjuntivo", req: 25 }
+            { id: "present", name: "Presente", req: 0, color: "var(--t-present)" },
+            { id: "preterite", name: "Pretérito", req: 5, color: "var(--t-preterite)" },
+            { id: "imperfect", name: "Imperfecto", req: 10, color: "var(--t-imperfect)" },
+            { id: "future", name: "Futuro", req: 15, color: "var(--t-future)" },
+            { id: "conditional", name: "Condicional", req: 20, color: "var(--t-conditional)" },
+            { id: "subjunctive", name: "Subjuntivo", req: 25, color: "var(--t-subjunctive)" }
         ];
 
         const verbsDB = {
@@ -241,20 +256,20 @@
             subjunctive: { ar: ["e", "és", "e", "emos", "en"], er: ["a", "ás", "a", "amos", "an"], ir: ["a", "ás", "a", "amos", "an"] }
         };
 
-        // UI Preferences Storage
+        // UI Preferences
         let userSettings = JSON.parse(localStorage.getItem('pySpanishPrefs')) || { strict: false, pace: 2 };
         document.getElementById('strictAccentsToggle').checked = userSettings.strict;
         document.getElementById('paceMultiplier').value = userSettings.pace;
 
         // Core App Storage
-        let userData = JSON.parse(localStorage.getItem('pySpanishV8')) || { lastActive: new Date().toDateString(), verbs: {} };
+        let userData = JSON.parse(localStorage.getItem('pySpanishV9')) || { lastActive: new Date().toDateString(), verbs: {} };
         Object.keys(verbsDB).forEach(v => { if (!userData.verbs[v]) userData.verbs[v] = { streak: 0 }; });
 
         let today = new Date().toDateString();
         if (userData.lastActive !== today) {
             Object.keys(verbsDB).forEach(v => { userData.verbs[v].streak = Math.max(0, userData.verbs[v].streak - 2); });
             userData.lastActive = today;
-            localStorage.setItem('pySpanishV8', JSON.stringify(userData));
+            localStorage.setItem('pySpanishV9', JSON.stringify(userData));
         }
 
         let state = { 
@@ -264,18 +279,20 @@
             correctAnswer: "", 
             globalScore: 0, 
             view: 'practice',
-            pace: userSettings.pace
+            pace: userSettings.pace,
+            lastCombo: "", // Anti-repeat tracking
+            focus: { active: false, tenseId: null, repsLeft: 0 } // Onboarding mode tracking
         };
 
         // DOM Setup
         const elInput = document.getElementById('answerInput');
         const elFeedback = document.getElementById('feedback');
-        const viewPractice = document.getElementById('viewPractice');
-        const viewReference = document.getElementById('viewReference');
+        const elSubmitBtn = document.getElementById('submitBtn');
+        const elDisplayTense = document.getElementById('displayTense');
+        const elPracticeCard = document.getElementById('practiceCard');
 
         const removeAccents = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-        // Prevent rich text pasting in contenteditable
         elInput.addEventListener('paste', (e) => {
             e.preventDefault();
             const text = (e.originalEvent || e).clipboardData.getData('text/plain');
@@ -292,6 +309,7 @@
             state.pace = parseInt(e.target.value);
             userSettings.pace = state.pace;
             localStorage.setItem('pySpanishPrefs', JSON.stringify(userSettings));
+            state.focus.active = false; // Kill focus mode if settings change
             renderSidebar();
             if (state.view === 'practice') generateQuestion();
             if (state.view === 'reference') renderReference();
@@ -329,7 +347,8 @@
                 } else {
                     div.innerHTML = `${v} <span class="chip-streak">🔥 ${streak}</span>`;
                     div.onclick = () => { 
-                        state.currentVerb = v; 
+                        state.currentVerb = v;
+                        state.focus.active = false; // Reset focus mode on verb switch
                         renderSidebar(); 
                         if(state.view === 'practice') { generateQuestion(); } 
                         if(state.view === 'reference') { renderReference(); }
@@ -342,17 +361,45 @@
         function generateQuestion() {
             const streak = userData.verbs[state.currentVerb].streak;
             let available = tenses.filter(t => streak >= (t.req * state.pace));
-            if (available.length === 0) available = [tenses[0]]; // Fallback safety
+            if (available.length === 0) available = [tenses[0]];
             
-            state.currentTense = available[Math.floor(Math.random() * available.length)];
-            state.currentPronounIdx = Math.floor(Math.random() * pronouns.length);
+            // Focus Mode Intercept (forces questions to be from newly unlocked tense)
+            if (state.focus.active && state.focus.repsLeft > 0) {
+                const focusTense = tenses.find(t => t.id === state.focus.tenseId);
+                if (focusTense) available = [focusTense];
+            } else {
+                state.focus.active = false; // Exhausted reps
+            }
+
+            let candidateTense, candidatePronounIdx, combo;
+            let safetyCounter = 0;
+
+            // Anti-Repeat Generation Loop
+            do {
+                candidateTense = available[Math.floor(Math.random() * available.length)];
+                candidatePronounIdx = Math.floor(Math.random() * pronouns.length);
+                combo = `${state.currentVerb}-${candidateTense.id}-${candidatePronounIdx}`;
+                safetyCounter++;
+            } while (combo === state.lastCombo && safetyCounter < 10);
+
+            state.lastCombo = combo;
+            state.currentTense = candidateTense;
+            state.currentPronounIdx = candidatePronounIdx;
             state.correctAnswer = getConjugation(state.currentVerb, state.currentTense.id, state.currentPronounIdx);
 
-            document.getElementById('displayTense').innerText = state.currentTense.name;
+            // UI Updates
+            elDisplayTense.innerText = state.focus.active ? `FOCUS: ${state.currentTense.name} (${state.focus.repsLeft} left)` : state.currentTense.name;
             document.getElementById('displayLevel').innerText = `🔥 ${streak}`;
             document.getElementById('displayPronoun').innerText = pronouns[state.currentPronounIdx].toUpperCase();
             document.getElementById('displayInfinitive').innerText = state.currentVerb;
             
+            // Dynamic Tense Colors
+            elDisplayTense.style.color = candidateTense.color;
+            elPracticeCard.style.borderTopColor = candidateTense.color;
+            elSubmitBtn.style.backgroundColor = candidateTense.color;
+            // Contrast Check (Yellow & Green get black text, rest get white)
+            elSubmitBtn.style.color = (candidateTense.id === 'present' || candidateTense.id === 'future') ? '#000' : '#fff';
+
             elInput.innerText = "";
             elFeedback.className = "feedback";
             if (state.view === 'practice') elInput.focus();
@@ -386,17 +433,35 @@
                 feedbackType = "incorrect"; titleText = `Incorrect. Answer: ${rawCorrect}`;
             }
 
+            // Progression & Unlock Detection Logic
             const currentStreak = userData.verbs[state.currentVerb].streak;
+            const availableBefore = tenses.filter(t => currentStreak >= (t.req * state.pace)).length;
 
             if (isCorrect) {
                 userData.verbs[state.currentVerb].streak++;
+                const newStreak = userData.verbs[state.currentVerb].streak;
+                const availableAfter = tenses.filter(t => newStreak >= (t.req * state.pace));
+
+                // Did they just unlock a new tense?
+                if (availableAfter.length > availableBefore && availableAfter.length > 1) {
+                    const newTense = availableAfter[availableAfter.length - 1];
+                    titleText = `¡NUEVO NIVEL! ${newTense.name.toUpperCase()} UNLOCKED 🚀`;
+                    // Activate Focus Mode (scale reps by pace)
+                    state.focus = { active: true, tenseId: newTense.id, repsLeft: 3 + state.pace };
+                } else if (state.focus.active) {
+                    state.focus.repsLeft--; // Count down focus reps
+                }
+
                 elFeedback.innerHTML = `<div class="fb-title">${titleText}</div>`;
                 elFeedback.classList.add(feedbackType);
-                localStorage.setItem('pySpanishV8', JSON.stringify(userData));
+                localStorage.setItem('pySpanishV9', JSON.stringify(userData));
                 renderSidebar();
                 setTimeout(() => generateQuestion(), 900);
+
             } else {
                 userData.verbs[state.currentVerb].streak = Math.max(0, currentStreak - 2);
+                if (state.focus.active) state.focus.repsLeft--; // Misses still burn a focus rep so they don't get stuck forever
+                
                 const obj = verbsDB[state.currentVerb].obj;
                 const p = pronouns[state.currentPronounIdx].split('/')[0];
                 
@@ -406,7 +471,7 @@
                     <div class="fb-example">Ejemplo: ${p.charAt(0).toUpperCase() + p.slice(1)} ${rawCorrect} ${obj}.</div>
                 `;
                 elFeedback.classList.add(feedbackType);
-                localStorage.setItem('pySpanishV8', JSON.stringify(userData));
+                localStorage.setItem('pySpanishV9', JSON.stringify(userData));
                 renderSidebar();
                 
                 setTimeout(() => elInput.focus(), 100);
@@ -431,8 +496,8 @@
                 
                 let html = `
                     <div class="tense-card ${isLocked ? 'locked' : ''}">
-                        <div class="tense-card-header">
-                            <span>${t.name}</span> 
+                        <div class="tense-card-header" style="${!isLocked ? `border-top: 3px solid ${t.color};` : ''}">
+                            <span style="color: ${isLocked ? 'white' : t.color}">${t.name}</span> 
                             <span class="req">${isLocked ? `🔒 Unlocks at 🔥 ${scaledReq}` : `Unlocked`}</span>
                         </div>
                         <ul class="tense-list">
@@ -458,24 +523,22 @@
         // View Controller
         window.switchTab = function(targetView) {
             state.view = targetView;
-            
             document.getElementById('tabPractice').classList.toggle('active', targetView === 'practice');
             document.getElementById('tabReference').classList.toggle('active', targetView === 'reference');
             
             if (targetView === 'practice') {
-                viewReference.classList.remove('active-view');
-                viewPractice.classList.add('active-view');
+                document.getElementById('viewReference').classList.remove('active-view');
+                document.getElementById('viewPractice').classList.add('active-view');
                 generateQuestion();
             } else {
-                viewPractice.classList.remove('active-view');
-                viewReference.classList.add('active-view');
+                document.getElementById('viewPractice').classList.remove('active-view');
+                document.getElementById('viewReference').classList.add('active-view');
                 renderReference();
             }
         };
 
         // Listeners
         document.getElementById('submitBtn').addEventListener('click', checkAnswer);
-        
         elInput.addEventListener('keydown', (e) => { 
             if (e.key === 'Enter') {
                 e.preventDefault(); 
