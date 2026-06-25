@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Español Crash ⚡️</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        :root {
+            --bg: #111;
+            --text: #f4f4f5;
+            --primary: #fbbf24;
+            --error: #ef4444;
+            --success: #22c55e;
+            --surface: #27272a;
+        }
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+        }
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 20px; 
+        }
+        header { 
+            width: 100%; 
+            max-width: 400px; 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 40px; 
+            margin-top: 20px; 
+            font-weight: bold; 
+        }
+        .stats { 
+            display: flex; 
+            gap: 15px; 
+            color: var(--primary); 
+        }
+        .card { 
+            background: var(--surface); 
+            width: 100%; 
+            max-width: 400px; 
+            padding: 40px 20px; 
+            border-radius: 16px; 
+            text-align: center; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+        }
+        .pronoun { 
+            font-size: 1.2rem; 
+            color: #a1a1aa; 
+            margin-bottom: 5px; 
+        }
+        .infinitive { 
+            font-size: 2.5rem; 
+            font-weight: 800; 
+            margin-bottom: 30px; 
+            letter-spacing: -1px; 
+        }
+        input { 
+            width: 100%; 
+            background: var(--bg); 
+            border: 2px solid #3f3f46; 
+            color: white; 
+            padding: 15px; 
+            font-size: 1.5rem; 
+            border-radius: 8px; 
+            text-align: center; 
+            outline: none; 
+            transition: 0.2s; 
+            margin-bottom: 20px; 
+        }
+        input:focus { 
+            border-color: var(--primary); 
+        }
+        button { 
+            width: 100%; 
+            background: var(--primary); 
+            color: #000; 
+            font-weight: bold; 
+            font-size: 1.2rem; 
+            padding: 15px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: 0.1s; 
+        }
+        button:active { 
+            transform: scale(0.98); 
+        }
+        .feedback { 
+            margin-top: 20px; 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            height: 30px; 
+        }
+        .correct { color: var(--success); }
+        .incorrect { color: var(--error); }
+        .level-badge { 
+            background: #3f3f46; 
+            padding: 4px 10px; 
+            border-radius: 20px; 
+            font-size: 0.8rem; 
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>Español ⚡️</div>
+        <div class="stats">
+            <span id="streakDisplay">🔥 0</span>
+            <span id="levelDisplay" class="level-badge">Lvl 1: -AR</span>
+        </div>
+    </header>
+
+    <div class="card">
+        <div class="pronoun" id="pronoun">Yo</div>
+        <div class="infinitive" id="infinitive">hablar</div>
+        
+        <input type="text" id="answerInput" placeholder="Type here..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <button id="submitBtn">Check</button>
+        
+        <div class="feedback" id="feedback"></div>
+    </div>
+
+    <script>
+        // Data & Rules
+        const pronouns = ["yo", "tú", "él/ella", "nosotros", "ellos/ellas"];
+        
+        const dictionary = {
+            1: [ // Level 1: Regular -AR (High Frequency)
+                { inf: "hablar", root: "habl", type: "ar" },
+                { inf: "trabajar", root: "trabaj", type: "ar" },
+                { inf: "estudiar", root: "estudi", type: "ar" },
+                { inf: "amar", root: "am", type: "ar" },
+                { inf: "ayudar", root: "ayud", type: "ar" },
+                { inf: "bailar", root: "bail", type: "ar" },
+                { inf: "caminar", root: "camin", type: "ar" },
+                { inf: "cantar", root: "cant", type: "ar" },
+                { inf: "cocinar", root: "cocin", type: "ar" },
+                { inf: "comprar", root: "compr", type: "ar" },
+                { inf: "escuchar", root: "escuch", type: "ar" },
+                { inf: "llegar", root: "lleg", type: "ar" },
+                { inf: "mirar", root: "mir", type: "ar" },
+                { inf: "nadar", root: "nad", type: "ar" },
+                { inf: "necesitar", root: "necesit", type: "ar" },
+                { inf: "pagar", root: "pag", type: "ar" },
+                { inf: "practicar", root: "practic", type: "ar" },
+                { inf: "tomar", root: "tom", type: "ar" },
+                { inf: "viajar", root: "viaj", type: "ar" }
+            ],
+            2: [ // Level 2: Regular -ER/-IR (High Frequency)
+                { inf: "comer", root: "com", type: "er" },
+                { inf: "beber", root: "beb", type: "er" },
+                { inf: "vivir", root: "viv", type: "ir" },
+                { inf: "escribir", root: "escrib", type: "ir" },
+                { inf: "abrir", root: "abr", type: "ir" },
+                { inf: "aprender", root: "aprend", type: "er" },
+                { inf: "comprender", root: "comprend", type: "er" },
+                { inf: "correr", root: "corr", type: "er" },
+                { inf: "creer", root: "cre", type: "er" },
+                { inf: "deber", root: "deb", type: "er" },
+                { inf: "decidir", root: "decid", type: "ir" },
+                { inf: "leer", root: "le", type: "er" },
+                { inf: "recibir", root: "recib", type: "ir" },
+                { inf: "responder", root: "respond", type: "er" },
+                { inf: "romper", root: "romp", type: "er" },
+                { inf: "vender", root: "vend", type: "er" },
+                { inf: "asistir", root: "asist", type: "ir" }
+            ],
+            3: [ // Level 3: The "Go" Verbs, Stem-Changers & Irregulars
+                { inf: "ser", type: "irr", forms: ["soy", "eres", "es", "somos", "son"] },
+                { inf: "estar", type: "irr", forms: ["estoy", "estás", "está", "estamos", "están"] },
+                { inf: "tener", type: "irr", forms: ["tengo", "tienes", "tiene", "tenemos", "tienen"] },
+                { inf: "ir", type: "irr", forms: ["voy", "vas", "va", "vamos", "van"] },
+                { inf: "hacer", type: "irr", forms: ["hago", "haces", "hace", "hacemos", "hacen"] },
+                { inf: "poder", type: "irr", forms: ["puedo", "puedes", "puede", "podemos", "pueden"] },
+                { inf: "querer", type: "irr", forms: ["quiero", "quieres", "quiere", "queremos", "quieren"] },
+                { inf: "decir", type: "irr", forms: ["digo", "dices", "dice", "decimos", "dicen"] },
+                { inf: "venir", type: "irr", forms: ["vengo", "vienes", "viene", "venimos", "vienen"] },
+                { inf: "saber", type: "irr", forms: ["sé", "sabes", "sabe", "sabemos", "saben"] },
+                { inf: "dar", type: "irr", forms: ["doy", "das", "da", "damos", "dan"] },
+                { inf: "salir", type: "irr", forms: ["salgo", "sales", "sale", "salimos", "salen"] },
+                { inf: "jugar", type: "irr", forms: ["juego", "juegas", "juega", "jugamos", "juegan"] },
+                { inf: "dormir", type: "irr", forms: ["duermo", "duermes", "duerme", "dormimos", "duermen"] },
+                { inf: "pensar", type: "irr", forms: ["pienso", "piensas", "piensa", "pensamos", "piensan"] }
+            ]
+        };
+
+        const endings = {
+            "ar": ["o", "as", "a", "amos", "an"],
+            "er": ["o", "es", "e", "emos", "en"],
+            "ir": ["o", "es", "e", "imos", "en"]
+        };
+
+        // State
+        let state = {
+            streak: 0,
+            level: 1,
+            currentVerb: null,
+            currentPronounIdx: 0,
+            correctAnswer: ""
+        };
+
+        // DOM Elements
+        const elPronoun = document.getElementById('pronoun');
+        const elInfinitive = document.getElementById('infinitive');
+        const elInput = document.getElementById('answerInput');
+        const elSubmit = document.getElementById('submitBtn');
+        const elFeedback = document.getElementById('feedback');
+        const elStreak = document.getElementById('streakDisplay');
+        const elLevel = document.getElementById('levelDisplay');
+
+        // Logic
+        function getConjugation(verb, pIdx) {
+            if (verb.type === "irr") return verb.forms[pIdx];
+            return verb.root + endings[verb.type][pIdx];
+        }
+
+        function evaluateLevel() {
+            if (state.streak >= 15) { 
+                state.level = 3; 
+                elLevel.innerText = "Lvl 3: Irregulars"; 
+            } else if (state.streak >= 7) { 
+                state.level = 2; 
+                elLevel.innerText = "Lvl 2: -ER/-IR"; 
+            } else { 
+                state.level = 1; 
+                elLevel.innerText = "Lvl 1: -AR"; 
+            }
+        }
+
+        function generateQuestion() {
+            evaluateLevel();
+            
+            // Pick a verb from available levels (pool includes current and previous levels)
+            let availableVerbs = [];
+            for (let i = 1; i <= state.level; i++) {
+                availableVerbs = availableVerbs.concat(dictionary[i]);
+            }
+            
+            state.currentVerb = availableVerbs[Math.floor(Math.random() * availableVerbs.length)];
+            state.currentPronounIdx = Math.floor(Math.random() * pronouns.length);
+            state.correctAnswer = getConjugation(state.currentVerb, state.currentPronounIdx);
+
+            elPronoun.innerText = pronouns[state.currentPronounIdx].toUpperCase();
+            elInfinitive.innerText = state.currentVerb.inf;
+            elInput.value = "";
+            elInput.focus();
+        }
+
+        function checkAnswer() {
+            const userAnswer = elInput.value.trim().toLowerCase();
+            if (!userAnswer) return;
+
+            if (userAnswer === state.correctAnswer) {
+                state.streak++;
+                elFeedback.innerText = "¡Correcto!";
+                elFeedback.className = "feedback correct";
+                setTimeout(() => { 
+                    elFeedback.innerText = ""; 
+                    generateQuestion(); 
+                }, 800);
+            } else {
+                state.streak = Math.max(0, state.streak - 2); // Harsh penalty for learning
+                elFeedback.innerText = `No. ${state.correctAnswer}`;
+                elFeedback.className = "feedback incorrect";
+                setTimeout(() => { 
+                    elFeedback.innerText = ""; 
+                    generateQuestion(); 
+                }, 2000);
+            }
+            elStreak.innerText = `🔥 ${state.streak}`;
+        }
+
+        // Event Listeners
+        elSubmit.addEventListener('click', checkAnswer);
+        elInput.addEventListener('keypress', (e) => { 
+            if (e.key === 'Enter') checkAnswer(); 
+        });
+
+        // PWA Setup
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(console.error);
+        }
+
+        // Init
+        generateQuestion();
+    </script>
+</body>
+</html>
