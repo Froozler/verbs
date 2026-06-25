@@ -32,8 +32,10 @@
         .nav-tabs button.active { background: var(--primary); color: #000; }
 
         /* Settings Strip */
-        .settings-strip { display: flex; justify-content: flex-end; padding: 8px 20px; background: var(--bg-alt); border-bottom: 1px solid #222; font-size: 0.8rem; }
+        .settings-strip { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--bg-alt); border-bottom: 1px solid #222; font-size: 0.85rem; gap: 10px; }
         .toggle-label { display: flex; align-items: center; gap: 6px; color: #a1a1aa; cursor: pointer; }
+        .pace-control { display: flex; align-items: center; gap: 8px; color: #a1a1aa; }
+        .pace-control select { background: var(--surface); color: white; border: 1px solid #3f3f46; border-radius: 6px; padding: 4px 8px; font-size: 0.85rem; outline: none; cursor: pointer; }
 
         /* Sidebar / Verb Selector */
         .sidebar { background: var(--surface); display: flex; gap: 10px; padding: 12px; overflow-x: auto; white-space: nowrap; border-bottom: 1px solid #111; flex-shrink: 0; scrollbar-width: none; }
@@ -114,6 +116,15 @@
         <label class="toggle-label">
             <input type="checkbox" id="strictAccentsToggle"> Strict Accents (á, é, í, ó, ú)
         </label>
+        <div class="pace-control">
+            <label for="paceMultiplier">Pace:</label>
+            <select id="paceMultiplier">
+                <option value="1">1x (Fast)</option>
+                <option value="2">2x (Normal)</option>
+                <option value="3">3x (Slow)</option>
+                <option value="5">5x (Grind)</option>
+            </select>
+        </div>
     </div>
 
     <div class="sidebar" id="verbList"></div>
@@ -230,19 +241,31 @@
             subjunctive: { ar: ["e", "és", "e", "emos", "en"], er: ["a", "ás", "a", "amos", "an"], ir: ["a", "ás", "a", "amos", "an"] }
         };
 
-        // State & Storage Engine
-        let userData = JSON.parse(localStorage.getItem('pySpanishV7')) || { lastActive: new Date().toDateString(), verbs: {} };
+        // UI Preferences Storage
+        let userSettings = JSON.parse(localStorage.getItem('pySpanishPrefs')) || { strict: false, pace: 2 };
+        document.getElementById('strictAccentsToggle').checked = userSettings.strict;
+        document.getElementById('paceMultiplier').value = userSettings.pace;
+
+        // Core App Storage
+        let userData = JSON.parse(localStorage.getItem('pySpanishV8')) || { lastActive: new Date().toDateString(), verbs: {} };
         Object.keys(verbsDB).forEach(v => { if (!userData.verbs[v]) userData.verbs[v] = { streak: 0 }; });
 
         let today = new Date().toDateString();
         if (userData.lastActive !== today) {
-            // Apply decay
             Object.keys(verbsDB).forEach(v => { userData.verbs[v].streak = Math.max(0, userData.verbs[v].streak - 2); });
             userData.lastActive = today;
-            localStorage.setItem('pySpanishV7', JSON.stringify(userData));
+            localStorage.setItem('pySpanishV8', JSON.stringify(userData));
         }
 
-        let state = { currentVerb: "hablar", currentTense: null, currentPronounIdx: 0, correctAnswer: "", globalScore: 0, view: 'practice' };
+        let state = { 
+            currentVerb: "hablar", 
+            currentTense: null, 
+            currentPronounIdx: 0, 
+            correctAnswer: "", 
+            globalScore: 0, 
+            view: 'practice',
+            pace: userSettings.pace
+        };
 
         // DOM Setup
         const elInput = document.getElementById('answerInput');
@@ -257,6 +280,21 @@
             e.preventDefault();
             const text = (e.originalEvent || e).clipboardData.getData('text/plain');
             document.execCommand('insertText', false, text);
+        });
+
+        // Event Listeners for Settings
+        document.getElementById('strictAccentsToggle').addEventListener('change', (e) => {
+            userSettings.strict = e.target.checked;
+            localStorage.setItem('pySpanishPrefs', JSON.stringify(userSettings));
+        });
+
+        document.getElementById('paceMultiplier').addEventListener('change', (e) => {
+            state.pace = parseInt(e.target.value);
+            userSettings.pace = state.pace;
+            localStorage.setItem('pySpanishPrefs', JSON.stringify(userSettings));
+            renderSidebar();
+            if (state.view === 'practice') generateQuestion();
+            if (state.view === 'reference') renderReference();
         });
 
         // App Logic
@@ -279,14 +317,15 @@
             elVerbList.innerHTML = "";
 
             Object.entries(verbsDB).forEach(([v, data]) => {
-                const isLocked = state.globalScore < data.unlockReq;
+                const scaledReq = data.unlockReq * state.pace;
+                const isLocked = state.globalScore < scaledReq;
                 const streak = userData.verbs[v].streak;
                 
                 const div = document.createElement('div');
                 div.className = `verb-chip ${v === state.currentVerb ? 'selected' : ''} ${isLocked ? 'locked' : ''}`;
                 
                 if (isLocked) {
-                    div.innerHTML = `🔒 ${v} <span class="chip-streak">Req ${data.unlockReq}</span>`;
+                    div.innerHTML = `🔒 ${v} <span class="chip-streak">Req ${scaledReq}</span>`;
                 } else {
                     div.innerHTML = `${v} <span class="chip-streak">🔥 ${streak}</span>`;
                     div.onclick = () => { 
@@ -302,7 +341,7 @@
 
         function generateQuestion() {
             const streak = userData.verbs[state.currentVerb].streak;
-            let available = tenses.filter(t => streak >= t.req);
+            let available = tenses.filter(t => streak >= (t.req * state.pace));
             if (available.length === 0) available = [tenses[0]]; // Fallback safety
             
             state.currentTense = available[Math.floor(Math.random() * available.length)];
@@ -315,7 +354,7 @@
             document.getElementById('displayInfinitive').innerText = state.currentVerb;
             
             elInput.innerText = "";
-            elFeedback.className = "feedback"; // Hide feedback
+            elFeedback.className = "feedback";
             if (state.view === 'practice') elInput.focus();
         }
 
@@ -353,13 +392,13 @@
                 userData.verbs[state.currentVerb].streak++;
                 elFeedback.innerHTML = `<div class="fb-title">${titleText}</div>`;
                 elFeedback.classList.add(feedbackType);
-                localStorage.setItem('pySpanishV7', JSON.stringify(userData));
+                localStorage.setItem('pySpanishV8', JSON.stringify(userData));
                 renderSidebar();
                 setTimeout(() => generateQuestion(), 900);
             } else {
                 userData.verbs[state.currentVerb].streak = Math.max(0, currentStreak - 2);
                 const obj = verbsDB[state.currentVerb].obj;
-                const p = pronouns[state.currentPronounIdx].split('/')[0]; // Clean up 'él/ella' to just 'él' for the example
+                const p = pronouns[state.currentPronounIdx].split('/')[0];
                 
                 elFeedback.innerHTML = `
                     <div class="fb-title">${titleText}</div>
@@ -367,10 +406,9 @@
                     <div class="fb-example">Ejemplo: ${p.charAt(0).toUpperCase() + p.slice(1)} ${rawCorrect} ${obj}.</div>
                 `;
                 elFeedback.classList.add(feedbackType);
-                localStorage.setItem('pySpanishV7', JSON.stringify(userData));
+                localStorage.setItem('pySpanishV8', JSON.stringify(userData));
                 renderSidebar();
                 
-                // If they miss it, force them to clear it manually or wait slightly longer so they can read the rule
                 setTimeout(() => elInput.focus(), 100);
             }
         }
@@ -388,20 +426,20 @@
             grid.innerHTML = "";
 
             tenses.forEach(t => {
-                const isLocked = currentStreak < t.req;
+                const scaledReq = t.req * state.pace;
+                const isLocked = currentStreak < scaledReq;
                 
                 let html = `
                     <div class="tense-card ${isLocked ? 'locked' : ''}">
                         <div class="tense-card-header">
                             <span>${t.name}</span> 
-                            <span class="req">${isLocked ? `🔒 Unlocks at 🔥 ${t.req}` : `Unlocked`}</span>
+                            <span class="req">${isLocked ? `🔒 Unlocks at 🔥 ${scaledReq}` : `Unlocked`}</span>
                         </div>
                         <ul class="tense-list">
                 `;
                 
                 pronouns.forEach((p, idx) => {
                     const conj = getConjugation(verbInf, t.id, idx);
-                    // Special highlight for 'vos' row
                     const isVos = (idx === 1) ? "is-vos" : "";
                     
                     html += `
@@ -438,7 +476,6 @@
         // Listeners
         document.getElementById('submitBtn').addEventListener('click', checkAnswer);
         
-        // Enter key handling for the fake input
         elInput.addEventListener('keydown', (e) => { 
             if (e.key === 'Enter') {
                 e.preventDefault(); 
